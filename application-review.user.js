@@ -16,35 +16,42 @@
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
+checkForNotification();
+
 initActionsDropdown();
-addRejectionButton({
-    name: "Lacking skills",
-    reason: "Lacking skill(s)/qualification(s)",
-    sendEmail: true,
-});
-addRejectionButton({
-    name: "Wrong timezone",
-    reason: "Wrong timezone",
-    sendEmail: true,
-});
-addRejectionButton({
-    name: "No cover letter",
-    note: "No cover letter",
-    reason: "Other (add notes below)",
-    sendEmail: true,
-});
-addRejectionButton({
-    name: "Wrong job",
-    note: "Cover letter is for a different job/company",
-    reason: "Other (add notes below)",
-    sendEmail: true,
-});
-addRejectionButton({
-    name: "Illegible",
-    note: "Submission not in English",
-    reason: "Other (add notes below)",
-    sendEmail: true,
-});
+try {
+    addRejectionButton({
+        name: "Lacking skills",
+        reason: "Lacking skill(s)/qualification(s)",
+        sendEmail: true,
+    });
+    addRejectionButton({
+        name: "Wrong timezone",
+        reason: "Wrong timezone",
+        sendEmail: true,
+    });
+    addRejectionButton({
+        name: "No cover letter",
+        note: "No cover letter",
+        reason: "Other (add notes below)",
+        sendEmail: true,
+    });
+    addRejectionButton({
+        name: "Wrong job",
+        note: "Cover letter is for a different job/company",
+        reason: "Other (add notes below)",
+        sendEmail: true,
+    });
+    addRejectionButton({
+        name: "Illegible",
+        note: "Submission not in English",
+        reason: "Other (add notes below)",
+        sendEmail: true,
+    });
+} catch (error) {
+    pushNotification(error.message, true);
+    checkForNotification();
+}
 
 function initActionsDropdown() {
     /* global GM_getResourceText GM_addStyle */
@@ -110,7 +117,7 @@ function addRejectionButton({
     const actionsListEl = document.getElementById("additional-actions");
     if (!actionsListEl)
         throw new Error(
-            "[Canonical GH] failed to find the custom actions list"
+            "[Canonical GH] Failed to find the custom actions list"
         );
     const id = escapeId(name);
     actionsListEl.insertAdjacentHTML(
@@ -123,17 +130,22 @@ function addRejectionButton({
     const rejectionButtonEl = document.getElementById(id);
     if (!rejectionButtonEl)
         throw new Error(
-            "[Canonical GH] failed to add the rejection button " + name
+            "[Canonical GH] Failed to add the rejection button " + name
         );
-    rejectionButtonEl.addEventListener("click", () =>
-        reject({
-            name,
-            reason,
-            note,
-            startNewProcessAfterRejection,
-            sendEmail,
-        })
-    );
+    rejectionButtonEl.addEventListener("click", async () => {
+        try {
+            await reject({
+                name,
+                reason,
+                note,
+                startNewProcessAfterRejection,
+                sendEmail,
+            });
+        } catch (error) {
+            pushNotification(error.message, true);
+            checkForNotification();
+        }
+    });
 }
 
 /**
@@ -148,14 +160,14 @@ async function reject({
 }) {
     const mainEl = document.querySelector("*[data-react-props]");
     if (!mainEl)
-        throw new Error("[Canonical GH] failed to get the application context");
+        throw new Error("[Canonical GH] Failed to get the application context");
     const context = JSON.parse(mainEl.getAttribute("data-react-props"));
     const applicationId = context.current_application?.id;
     const personId = context.current_application?.person_id;
     const stageId = context.current_application?.current_stage?.app_stage_id;
     if (!(applicationId && stageId && personId))
         throw new Error(
-            "[Canonical GH] missing data in the application context"
+            "[Canonical GH] Missing data in the application context"
         );
     const formData = await getRejectionFormData(applicationId);
 
@@ -166,7 +178,7 @@ async function reject({
                 label === reason || label.match(new RegExp(reason, "i"))
         )?.value;
     if (!rejectionReasonId)
-        throw new Error("[Canonical GH] rejection reason not found: " + reason);
+        throw new Error("[Canonical GH] Rejection reason not found: " + reason);
 
     let payload = {
         from_review_tool: true,
@@ -186,7 +198,7 @@ async function reject({
         )?.value;
         if (!defaultEmailTemplateId)
             throw new Error(
-                "[Canonical GH] default email template not found: " + reason
+                "[Canonical GH] Default email template not found: " + reason
             );
         const emailTemplate = await getEmailTemplate(
             personId,
@@ -228,6 +240,8 @@ async function reject({
             referrerPolicy: "strict-origin-when-cross-origin",
         }
     );
+    pushNotification("Application rejected successfully");
+
     window.location.reload(true);
 }
 
@@ -302,7 +316,7 @@ async function reject({
 function getRejectionFormData(applicationId) {
     return httpGetJson(
         `https://canonical.greenhouse.io/applications/review/app_review/${applicationId}/reject_modal`,
-        "[Canonical GH] failed to get application rejection form data"
+        "[Canonical GH] Failed to get application rejection form data"
     );
 }
 
@@ -330,7 +344,7 @@ function getRejectionFormData(applicationId) {
 async function getEmailTemplate(personId, applicationId, emailTemplateId) {
     const emailTemplate = await httpGetJson(
         `https://canonical.greenhouse.io/person/${personId}/email_templates/${emailTemplateId}?application_id=${applicationId}`,
-        "[Canonical GH] failed to get application rejection email template"
+        "[Canonical GH] Failed to get application rejection email template"
     );
     if (!emailTemplate)
         throw new Error(
@@ -355,7 +369,6 @@ async function httpGetJson(url, errorMsg) {
             credentials: "include",
         });
         if (!response.ok) throw new Error();
-        // TODO: test with inexistent id
         return await response.json();
     } catch {
         throw new Error(errorMsg);
@@ -377,6 +390,88 @@ function getCSRFToken() {
 /*--------------------------------------------------*/
 /*         Vanilla framework CSS utilities          */
 /*--------------------------------------------------*/
+
+function pushNotification(message, error = false) {
+    localStorage.setItem(
+        "canonical.notification",
+        JSON.stringify({
+            message: message.replace("[Canonical GH] ", ""),
+            error,
+        })
+    );
+}
+
+function checkForNotification() {
+    const notification = localStorage.getItem("canonical.notification");
+    if (!notification) return;
+
+    const { message, error } = JSON.parse(notification);
+    document.body.insertAdjacentHTML(
+        "afterbegin",
+        /* HTML */
+        `
+            <div
+                class="p-notification--${error ? "negative" : "positive"}"
+                id="notification"
+            >
+                <div class="p-notification__content">
+                    <h5 class="p-notification__title">${message}</h5>
+                    <p class="p-notification__message">Canonical automation</p>
+                    <button
+                        class="p-notification__close"
+                        aria-controls="notification"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+            <style>
+                #notification {
+                    z-index: 9999;
+                    max-width: 20rem;
+                    padding: 0.5rem 3rem;
+                    margin: 1rem;
+                    position: fixed;
+                    right: 0;
+                    top: 0;
+                }
+            </style>
+        `
+    );
+    // Set up all notification close buttons.
+    var closeButtons = document.querySelectorAll(".p-notification__close");
+
+    for (var i = 0, l = closeButtons.length; i < l; i++) {
+        setupCloseButton(closeButtons[i]);
+    }
+    // Auto close after 5 seconds
+    setTimeout(() => {
+        closeButtons.forEach((button) => button.click());
+    }, 5 * 1000);
+}
+
+/* Dismissible notification js part */
+/**
+ * Attaches event listener for hide notification on close button click.
+ * @param {HTMLElement} closeButton The notification close button element.
+ */
+function setupCloseButton(closeButton) {
+    closeButton.addEventListener("click", function (event) {
+        var target = event.target.getAttribute("aria-controls");
+        var notification = document.getElementById(target);
+
+        if (notification) {
+            notification.classList.add("u-hide");
+        }
+
+        removeNotification();
+    });
+}
+
+function removeNotification() {
+    localStorage.removeItem("canonical.notification");
+}
+/* Context menu js part */
 /**
   Toggles the necessary aria- attributes' values on the menus
   and handles to show or hide them.
