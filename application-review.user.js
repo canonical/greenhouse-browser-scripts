@@ -149,8 +149,14 @@ function addRejectionButton({
 }
 
 /**
- * Fill the rejection form and submit
+ * fill the rejection form and submit
  * @private
+ * @param {object} rejection
+ * @param {string} rejection.reason the rejection reason
+ * @param {boolean} rejection.sendEmail indicates whether we should try to send an email
+ * @param {string|null} rejection.note the rejection node
+ * @param {boolean} rejection.startNewProcessAfterRejection whether this option needs to be enable on rejection
+ *
  */
 async function reject({
     reason,
@@ -179,7 +185,7 @@ async function reject({
         )?.value;
     if (!rejectionReasonId)
         throw new Error("[Canonical GH] Rejection reason not found: " + reason);
-
+    sendEmail = sendEmail && formData.can_email;
     let payload = {
         from_review_tool: true,
         from_stage_id: stageId,
@@ -224,7 +230,7 @@ async function reject({
 
     if (note) payload.rejection_note = note;
 
-    await fetch(
+    const response = await fetch(
         `https://canonical.greenhouse.io/applications/review/app_review/${applicationId}/reject`,
         {
             headers: {
@@ -240,6 +246,8 @@ async function reject({
             referrerPolicy: "strict-origin-when-cross-origin",
         }
     );
+    if (!response.ok)
+        throw new Error("[Canonical GH] Invalid rejection payload");
     pushNotification("Application rejected successfully");
 
     window.location.reload(true);
