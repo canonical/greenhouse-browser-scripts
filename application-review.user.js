@@ -78,7 +78,7 @@ function initActionsDropdown() {
     </span>
     <style>
         .p-contextual-menu__toggle {
-            margin: 0 1rem;
+            margin: 0 1rem 0 0;
         }
 
         .p-contextual-menu__group {
