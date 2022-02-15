@@ -16,6 +16,11 @@
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
 // ==/UserScript==
+
+// reload the page if requested by previous operations
+if (location.href.includes("canonical-reload=true"))
+    window.location = window.location.href.replace(/&canonical-reload=.+/, "");
+
 checkForNotification();
 
 initActionsDropdown();
@@ -248,9 +253,11 @@ async function reject({
     );
     if (!response.ok)
         throw new Error("[Canonical GH] Invalid rejection payload");
-    pushNotification("Application rejected successfully");
-
-    window.location.reload(true);
+    await navigateToNextApplication(
+        context.applications.filter(
+            (application) => application.id !== applicationId
+        )
+    );
 }
 
 /**
@@ -383,6 +390,26 @@ async function httpGetJson(url, errorMsg) {
     }
 }
 
+async function navigateToNextApplication(applications) {
+    setLoading();
+    await sleep(1000);
+
+    const nextApplicationEl = document.querySelector("[data-provides*=skip]");
+    if (nextApplicationEl && applications.length) {
+        nextApplicationEl.click();
+        removeNotification();
+        pushNotification("Application rejected successfully");
+        // the restart option indicates that once the reload page is done
+        // and the script is loaded, do another reload to update the cached data
+        window.location =
+            window.location.href.replace(/&canonical-reload=.+/, "") +
+            "&canonical-reload=true";
+    } else {
+        pushNotification("No more applications to review 🎉");
+        window.location = window.location.href;
+    }
+}
+
 /*--------------------------------------------------*/
 /*                    Utilities                     */
 /*--------------------------------------------------*/
@@ -395,9 +422,30 @@ function getCSRFToken() {
         .getAttribute("content");
 }
 
+function sleep(delay) {
+    return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
 /*--------------------------------------------------*/
 /*         Vanilla framework CSS utilities          */
 /*--------------------------------------------------*/
+
+function setLoading() {
+    const rejectionDropdownEl = document.querySelector(
+        "[aria-controls=menu-1]"
+    );
+    rejectionDropdownEl.querySelectorAll("*").forEach((e) => e.remove());
+    rejectionDropdownEl.insertAdjacentHTML(
+        "afterbegin",
+        `
+    <i class="p-icon--spinner u-animation--spin is-light"></i>
+    <span>Loading</span>
+    `
+    );
+    rejectionDropdownEl.setAttribute("disabled", "true");
+    // close the dropdown menu
+    document.body.click();
+}
 
 function pushNotification(message, error = false) {
     localStorage.setItem(
