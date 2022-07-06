@@ -26,11 +26,6 @@ checkForNotification();
 initActionsDropdown();
 try {
     addRejectionButton({
-        name: "Lacking skills",
-        reason: "Lacking skill(s)/qualification(s)",
-        sendEmail: true,
-    });
-    addRejectionButton({
         name: "Wrong timezone",
         reason: "Wrong timezone",
         sendEmail: true,
@@ -70,17 +65,22 @@ function initActionsDropdown() {
         "afterbegin",
         /* html */
         `
-    <span class="vanilla p-contextual-menu--left">
-        <button class="p-button--negative p-contextual-menu__toggle has-icon" aria-controls="menu-1" aria-expanded="false" aria-haspopup="true">
-            <i class="p-icon--chevron-down is-light p-contextual-menu__indicator"></i>
-            <span>Quick rejections</span>
+        <div class="vanilla">
+         <button id="lacking-skill-button" class="p-button--negative">
+            Lacking skills
         </button>
-        <span class="p-contextual-menu__dropdown" id="menu-1" aria-hidden="true">
-            <span class="p-contextual-menu__group" id="additional-actions">
-            <!-- Actions will be added here -->
+        <span class="p-contextual-menu--left">
+            <button class="p-button--negative p-contextual-menu__toggle has-icon" aria-controls="menu-1" aria-expanded="false" aria-haspopup="true">
+                <i class="p-icon--chevron-down is-light p-contextual-menu__indicator"></i>
+                <span>Quick rejections</span>
+            </button>
+            <span class="p-contextual-menu__dropdown" id="menu-1" aria-hidden="true">
+                <span class="p-contextual-menu__group" id="additional-actions">
+                <!-- Actions will be added here -->
+                </span>
             </span>
-        </span>
-    </span>
+         </span>
+        </div>
     <style>
         .p-contextual-menu__toggle {
             margin: 0 1rem 0 0;
@@ -97,6 +97,29 @@ function initActionsDropdown() {
     </style>
     `
     );
+
+    // add a listener
+    const rejectionButtonEl = document.getElementById("lacking-skill-button");
+    if (!rejectionButtonEl)
+        throw new Error(
+            "[Canonical GH] Failed to add the rejection button lacking-skill-button"
+        );
+    rejectionButtonEl.addEventListener("click", async () => {
+        try {
+            setQuickRejectionLoading();
+            await reject({
+                name: "Lacking skills",
+                reason: "Lacking skill(s)/qualification(s)",
+                note: null,
+                startNewProcessAfterRejection: false,
+                sendEmail: true,
+            });
+        } catch (error) {
+            pushNotification(error.message, true);
+            setEnabled();
+            checkForNotification();
+        }
+    });
 }
 
 /**
@@ -139,6 +162,7 @@ function addRejectionButton({
         );
     rejectionButtonEl.addEventListener("click", async () => {
         try {
+            setLoading();
             await reject({
                 name,
                 reason,
@@ -147,6 +171,7 @@ function addRejectionButton({
                 sendEmail,
             });
         } catch (error) {
+            setEnabled();
             pushNotification(error.message, true);
             checkForNotification();
         }
@@ -391,7 +416,6 @@ async function httpGetJson(url, errorMsg) {
 }
 
 async function navigateToNextApplication(applications) {
-    setLoading();
     await sleep(1000);
 
     const nextApplicationEl = document.querySelector("[data-provides*=skip]");
@@ -430,21 +454,56 @@ function sleep(delay) {
 /*         Vanilla framework CSS utilities          */
 /*--------------------------------------------------*/
 
+function addSpinner(el) {
+    el.insertAdjacentHTML(
+        "afterbegin",
+        `
+    <i class="p-icon--spinner u-animation--spin is-light"></i>
+    `
+    );
+    el.setAttribute("disabled", "true");
+}
+
 function setLoading() {
     const rejectionDropdownEl = document.querySelector(
         "[aria-controls=menu-1]"
     );
-    rejectionDropdownEl.querySelectorAll("*").forEach((e) => e.remove());
-    rejectionDropdownEl.insertAdjacentHTML(
-        "afterbegin",
-        `
-    <i class="p-icon--spinner u-animation--spin is-light"></i>
-    <span>Loading</span>
-    `
-    );
-    rejectionDropdownEl.setAttribute("disabled", "true");
+
+    addSpinner(rejectionDropdownEl);
+
     // close the dropdown menu
     document.body.click();
+
+    const quickRejectionButton = document.getElementById(
+        "lacking-skill-button"
+    );
+    quickRejectionButton.setAttribute("disabled", "true");
+}
+
+function setQuickRejectionLoading() {
+    const quickRejectionButton = document.getElementById(
+        "lacking-skill-button"
+    );
+    addSpinner(quickRejectionButton);
+
+    const rejectionDropdownEl = document.querySelector(
+        "[aria-controls=menu-1]"
+    );
+    rejectionDropdownEl.setAttribute("disabled", "true");
+}
+
+function setEnabled() {
+    const rejectionDropdownEl = document.querySelector(
+        "[aria-controls=menu-1]"
+    );
+    rejectionDropdownEl.getElementsByClassName("p-icon--spinner")[0]?.remove();
+    rejectionDropdownEl.disabled = false;
+
+    const quickRejectionButton = document.getElementById(
+        "lacking-skill-button"
+    );
+    quickRejectionButton.getElementsByClassName("p-icon--spinner")[0]?.remove();
+    quickRejectionButton.disabled = false;
 }
 
 function pushNotification(message, error = false) {
