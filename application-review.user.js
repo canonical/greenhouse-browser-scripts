@@ -54,71 +54,124 @@ try {
 }
 
 function initActionsDropdown() {
-    /* global GM_getResourceText GM_addStyle */
-    // add Vanilla framework CSS
-    var newCSS = GM_getResourceText("customCSS");
-    GM_addStyle(newCSS);
-
     const rejectBtnEl = document.querySelector("*[data-provides='reject']");
     const actionsBarEl = rejectBtnEl.parentNode;
+
     actionsBarEl.insertAdjacentHTML(
         "afterbegin",
         /* html */
         `
         <div class="rejection">
-            <button id="lacking-skill-button" class="rejection-button">
-                Lacking skills
+         <button id="lacking-skill-button" class="rejection-button">
+            Lacking skills
+        </button>
+        <div class="contextual-menu--left">
+            <button class="rejection-button contextual-menu__toggle has-icon" aria-controls="menu-1" aria-expanded="false" aria-haspopup="true">
+                <i class="arrowhead">
+                     <svg width="15" height="10" viewBox="-2.5 -5 45 30" preserveAspectRatio="none">
+                         <path d="M0,0 l15,20 l15,-20" fill="none" stroke="white" stroke-linecap="round" stroke-width="5" />
+                     </svg>
+                </i>
+                <span>Quick rejections</span>
             </button>
-            <div class="p-contextual-menu--left">
-                <button class="rejection-button p-contextual-menu__toggle has-icon" aria-controls="menu-1" aria-expanded="false" aria-haspopup="true">
-                    <i class="p-icon--chevron-down is-light p-contextual-menu__indicator"></i>
-                    <span>Quick rejections</span>
-                </button>
-                <span class="p-contextual-menu__dropdown" id="menu-1" aria-hidden="true">
-                    <span class="p-contextual-menu__group" id="additional-actions">
-                    <!-- Actions will be added here -->
-                    </span>
+            <span class="contextual-menu__dropdown" id="menu-1" aria-hidden="true">
+                <span class="contextual-menu__group" id="additional-actions">
+                <!-- Actions will be added here -->
                 </span>
-            </div>
+            </span>
+         </div>
         </div>
-        <style>
-            .rejection {
+    <style>
+        .rejection {
+           display: flex;
+        }
+        .rejection-button {
+            height: 36px;
+            background-color: #d8372a;
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 0 1rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            margin: 0;
+            margin-right: 0.5rem;
+            cursor: pointer;
+            align-content: center;
             display: flex;
-            }
-            .rejection-button {
-                height: 36px;
-                background-color: #d8372a;
-                color: white;
-                font-weight: 600;
-                border: none;
-                padding: 0 1rem;
-                border-radius: 3px;
-                font-size: 0.75rem;
-                margin: 0;
-                margin-right: 0.5rem;
+            align-items: center;
+       }
+
+       .rejection-button:hover {
+           background-color: #af2b20;
+       }
+
+       .rejection-button[aria-expanded=true] {
+           background-color: #af2b20;
+       }
+
+       .rejection-button:disabled, .rejection-button:disabled:hover {
+           background-color: #767676;
+           cursor: not-allowed;
+       }
+
+       .contextual-menu__group {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            background: white;
+            border: 1px solid rgb(217, 217, 217);
         }
 
-        .rejection-button:hover, .rejection-button:disabled:hover {
-            background-color: #af2b20;
+        .arrowhead {
+           margin-right: 0.3rem;
+           margin-top: 0.2rem;
         }
 
-        .rejection-button[aria-expanded=true] {
-            background-color: #af2b20;
+        .contextual-menu__link {
+            border: none;
+            outline: none;
+            text-align: left;
+            height: 2rem;
+            width: 7rem;
+            padding: 0 1rem;
+            background: white;
+            cursor: pointer;
         }
 
-        .rejection-button:disabled {
-            background-color: #af2b20;
-            cursor: not-allowed;
+        .contextual-menu__link:hover {
+            background: rgb(225, 225, 225);
         }
 
-        .p-contextual-menu__group {
-            overflow-x: hidden;
+        .contextual-menu__dropdown {
+            display: none;
         }
 
-        .p-contextual-menu__link {
-            font-size: 0.85rem;
+
+        .contextual-menu__dropdown[aria-hidden=false] {
+            display: block;
         }
-        </style>
+
+        .spinner {
+            margin-right: 0.5rem;
+            background: #767676;
+            width: 0.75rem;
+            height: 0.75rem;
+            border: 3px solid white;
+            border-top: 3px solid #767676;
+            border-radius: 50%;
+            transition-property: transform;
+            animation-name: rotate;
+            animation-duration: 1.2s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+
+        @-webkit-keyframes rotate {
+            from {ransform: rotate(0deg);}
+            to {transform: rotate(360deg);}
+        }
+    </style>
     `
     );
 
@@ -175,7 +228,7 @@ function addRejectionButton({
     actionsListEl.insertAdjacentHTML(
         "afterbegin",
         /* HTML */
-        `<button class="p-contextual-menu__link" id="${id}">${name}</button>`
+        `<button class="contextual-menu__link" id="${id}">${name}</button>`
     );
 
     // add a listener
@@ -482,7 +535,7 @@ function addSpinner(el) {
     el.insertAdjacentHTML(
         "afterbegin",
         `
-    <i class="p-icon--spinner u-animation--spin is-light"></i>
+    <div class="spinner"></div>
     `
     );
     el.setAttribute("disabled", "true");
@@ -520,13 +573,13 @@ function setEnabled() {
     const rejectionDropdownEl = document.querySelector(
         "[aria-controls=menu-1]"
     );
-    rejectionDropdownEl.getElementsByClassName("p-icon--spinner")[0]?.remove();
+    rejectionDropdownEl.getElementsByClassName("spinner")[0]?.remove();
     rejectionDropdownEl.disabled = false;
 
     const quickRejectionButton = document.getElementById(
         "lacking-skill-button"
     );
-    quickRejectionButton.getElementsByClassName("p-icon--spinner")[0]?.remove();
+    quickRejectionButton.getElementsByClassName("spinner")[0]?.remove();
     quickRejectionButton.disabled = false;
 }
 
@@ -550,17 +603,17 @@ function checkForNotification() {
         /* HTML */
         `
             <div
-                class="p-notification--${error ? "negative" : "positive"}"
+                class="notification--${error ? "negative" : "positive"}"
                 id="notification"
             >
-                <div class="p-notification__content">
-                    <h5 class="p-notification__title">${message}</h5>
-                    <p class="p-notification__message">Canonical automation</p>
+                <div class="notification__content">
+                    <h5 class="notification__title">${message}</h5>
+                    <p class="notification__message">Canonical automation</p>
                     <button
-                        class="p-notification__close"
+                        class="notification__close"
                         aria-controls="notification"
                     >
-                        Close
+                        X
                     </button>
                 </div>
             </div>
@@ -573,12 +626,29 @@ function checkForNotification() {
                     position: fixed;
                     right: 0;
                     top: 0;
+                    background: white;
+                    border-left: 0.5rem solid #008561;
+                    border-radius: 2px;
+                }
+
+                .notification__close {
+                    border: none;
+                    background: transparent;
+                    cursor: pointer;
+                    position: absolute;
+                    right: 0.5rem;
+                    top: 0.5rem;
+                    font-size: 1rem;
+                }
+
+                .u-hide {
+                    display: none;
                 }
             </style>
         `
     );
     // Set up all notification close buttons.
-    var closeButtons = document.querySelectorAll(".p-notification__close");
+    var closeButtons = document.querySelectorAll(".notification__close");
 
     for (var i = 0, l = closeButtons.length; i < l; i++) {
         setupCloseButton(closeButtons[i]);
@@ -698,4 +768,4 @@ function setupAllContextualMenus(contextualMenuToggleSelector) {
     });
 }
 
-setupAllContextualMenus(".p-contextual-menu__toggle");
+setupAllContextualMenus(".contextual-menu__toggle");
