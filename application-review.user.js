@@ -65,36 +65,60 @@ function initActionsDropdown() {
         "afterbegin",
         /* html */
         `
-        <div class="vanilla">
-         <button id="lacking-skill-button" class="p-button--negative">
-            Lacking skills
-        </button>
-        <span class="p-contextual-menu--left">
-            <button class="p-button--negative p-contextual-menu__toggle has-icon" aria-controls="menu-1" aria-expanded="false" aria-haspopup="true">
-                <i class="p-icon--chevron-down is-light p-contextual-menu__indicator"></i>
-                <span>Quick rejections</span>
+        <div class="rejection">
+            <button id="lacking-skill-button" class="rejection-button">
+                Lacking skills
             </button>
-            <span class="p-contextual-menu__dropdown" id="menu-1" aria-hidden="true">
-                <span class="p-contextual-menu__group" id="additional-actions">
-                <!-- Actions will be added here -->
+            <div class="p-contextual-menu--left">
+                <button class="rejection-button p-contextual-menu__toggle has-icon" aria-controls="menu-1" aria-expanded="false" aria-haspopup="true">
+                    <i class="p-icon--chevron-down is-light p-contextual-menu__indicator"></i>
+                    <span>Quick rejections</span>
+                </button>
+                <span class="p-contextual-menu__dropdown" id="menu-1" aria-hidden="true">
+                    <span class="p-contextual-menu__group" id="additional-actions">
+                    <!-- Actions will be added here -->
+                    </span>
                 </span>
-            </span>
-         </span>
+            </div>
         </div>
-    <style>
-        .p-contextual-menu__toggle {
-            margin: 0 1rem 0 0;
+        <style>
+            .rejection {
+            display: flex;
+            }
+            .rejection-button {
+                height: 36px;
+                background-color: #d8372a;
+                color: white;
+                font-weight: 600;
+                border: none;
+                padding: 0 1rem;
+                border-radius: 3px;
+                font-size: 0.75rem;
+                margin: 0;
+                margin-right: 0.5rem;
+        }
+
+        .rejection-button:hover, .rejection-button:disabled:hover {
+            background-color: #af2b20;
+        }
+
+        .rejection-button[aria-expanded=true] {
+            background-color: #af2b20;
+        }
+
+        .rejection-button:disabled {
+            background-color: #af2b20;
+            cursor: not-allowed;
         }
 
         .p-contextual-menu__group {
             overflow-x: hidden;
         }
 
-        .vanilla {
-            font-family: Ubuntu, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                Oxygen, Cantarell, "Open Sans", "Helvetica Neue", sans-serif
+        .p-contextual-menu__link {
+            font-size: 0.85rem;
         }
-    </style>
+        </style>
     `
     );
 
@@ -389,7 +413,7 @@ async function getEmailTemplate(personId, applicationId, emailTemplateId) {
     if (!emailTemplate)
         throw new Error(
             "[Canonical GH] Failed to retrieve email template with id " +
-                emailTemplateId
+            emailTemplateId
         );
     return emailTemplate;
 }
