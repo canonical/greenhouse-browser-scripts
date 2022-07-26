@@ -7,6 +7,7 @@ This project contains a set of handful [Userscripts](https://en.wikipedia.org/wi
 Here is the list of the available Userscripts:
 
 -   [Greenhouse Application Review](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review.user.js): Add quick rejection buttons to the application review page, to perform rejection with one button click
+-   [Greenhouse written interviews in a new tab](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js): Open written interviews in a new tab instead of downloading "File1.pdf" files
 
 ## Getting started
 
@@ -36,6 +37,7 @@ Once the browser extension is installed, for each script the you wish to install
 ### Userscript installation links
 
 -   Greenhouse application review: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review.user.js
+-   Greenhouse written interviews in a new tab: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js
 
 ## Receiving updates
 
@@ -72,3 +74,9 @@ Here is the list of rejection actions:
 
 When this is enabled you will see this addition element in the toolbar:
 ![Greenhouse application rejection buttons](/resources/greenhouse-application-rejection.png)
+
+## Greenhouse written interviews in new tab
+
+Open written interviews in a new tab instead of downloading "File1.pdf" files.
+
+Once the Userscript is installed, you may need to authorize popups for the first time.

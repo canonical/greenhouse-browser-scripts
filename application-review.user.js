@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      0.1.0
+// @version      0.2.0
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -12,9 +12,6 @@
 // @supportURL   https://github.com/canonical/greenhouse-browser-scripts/issues
 
 // @match        https://canonical.greenhouse.io/applications/review/app_review*
-// @resource     customCSS https://assets.ubuntu.com/v1/vanilla-framework-version-3.1.0.min.css
-// @grant        GM_addStyle
-// @grant        GM_getResourceText
 // ==/UserScript==
 
 // reload the page if requested by previous operations
@@ -466,7 +463,7 @@ async function getEmailTemplate(personId, applicationId, emailTemplateId) {
     if (!emailTemplate)
         throw new Error(
             "[Canonical GH] Failed to retrieve email template with id " +
-            emailTemplateId
+                emailTemplateId
         );
     return emailTemplate;
 }
