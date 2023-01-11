@@ -268,7 +268,7 @@ async function reject({
     note = null,
     startNewProcessAfterRejection = false,
 }) {
-    const mainEl = document.querySelector("*[data-react-props]");
+    const mainEl = document.querySelector("#app_review_wrapper [data-react-props]")
     if (!mainEl)
         throw new Error("[Canonical GH] Failed to get the application context");
     const context = JSON.parse(mainEl.getAttribute("data-react-props"));
