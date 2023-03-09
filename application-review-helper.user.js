@@ -123,6 +123,9 @@
         return "q-strong-no";
       }
     }
+    if (answer.trim() === "0") {
+      return "q-strong-no";
+    }
     if (!isNaN(answer) && answer.startsWith("3")) {
       var result = GPACheck(answer);
       if (result) {
