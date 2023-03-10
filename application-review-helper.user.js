@@ -66,33 +66,31 @@
         const questionText = question.querySelector("strong").innerText;
         const answer = question.querySelector("p").innerText;
         clearClass(question);
-        switch (questionText) {
-          case "Describe your experience using or contributing to open source software":
-            question.classList.add(textReview(answer));
-            break;
-          case "Describe your experience with JavaScript, TypeScript and SCSS":
-            question.classList.add(textReview(answer));
-            break;
-          case "Are you due to graduate soon, or have you graduated from university in the past two years?":
-            question.classList.add("q-no-decision");
-            break;
-          case "What time zone are you in?":
-            question.classList.add(locationReview(answer));
-            break;
-          case "What is your degree result? i.e. Upper second, 2.1, 85%, First class, GPA 3.8/4.0 (expected)":
-            question.classList.add(degreeReview(answer));
-            break;
-          case "How did you do in maths, physics or computer science at high school?":
-            question.classList.add(doReview(answer));
-            break;
-          case "How did you do in your native language at high school?":
-            question.classList.add(doReview(answer));
-            break;
-          case "We expect all colleagues to meet in person twice a year, at internal company events. We try to pick interesting and new locations, so this requires international travel for a total of 2-4 weeks per year depending on your responsibilities. Are you willing and able to commit to this?":
-            question.classList.add(yesReview(answer));
-            break;
-          default:
-            question.classList.add("q-no-decision");
+        if (questionText.startsWith("Describe")) {
+          question.classList.add(textReview(answer));
+        } else {
+          switch (questionText) {
+            case "Are you due to graduate soon, or have you graduated from university in the past two years?":
+              question.classList.add("q-no-decision");
+              break;
+            case "What time zone are you in?":
+              question.classList.add(locationReview(answer));
+              break;
+            case "What is your degree result? i.e. Upper second, 2.1, 85%, First class, GPA 3.8/4.0 (expected)":
+              question.classList.add(degreeReview(answer));
+              break;
+            case "How did you do in maths, physics or computer science at high school?":
+              question.classList.add(doReview(answer));
+              break;
+            case "How did you do in your native language at high school?":
+              question.classList.add(doReview(answer));
+              break;
+            case "We expect all colleagues to meet in person twice a year, at internal company events. We try to pick interesting and new locations, so this requires international travel for a total of 2-4 weeks per year depending on your responsibilities. Are you willing and able to commit to this?":
+              question.classList.add(yesReview(answer));
+              break;
+            default:
+              question.classList.add("q-no-decision");
+          }
         }
       });
     }
