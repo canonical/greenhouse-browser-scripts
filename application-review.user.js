@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      0.2.0
+// @version      0.3.0
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -28,15 +28,8 @@ try {
         sendEmail: true,
     });
     addRejectionButton({
-        name: "No cover letter",
-        note: "No cover letter",
-        reason: "Other (add notes below)",
-        sendEmail: true,
-    });
-    addRejectionButton({
-        name: "Wrong job",
-        note: "Cover letter is for a different job/company",
-        reason: "Other (add notes below)",
+        name: "Academics",
+        reason: "Academic track record",
         sendEmail: true,
     });
     addRejectionButton({
@@ -183,7 +176,7 @@ function initActionsDropdown() {
             setQuickRejectionLoading();
             await reject({
                 name: "Lacking skills",
-                reason: "Lacking skill(s)/qualification(s)",
+                reason: "Lacks domain experience",
                 note: null,
                 startNewProcessAfterRejection: false,
                 sendEmail: true,
@@ -268,7 +261,9 @@ async function reject({
     note = null,
     startNewProcessAfterRejection = false,
 }) {
-    const mainEl = document.querySelector("#app_review_wrapper [data-react-props]")
+    const mainEl = document.querySelector(
+        "#app_review_wrapper [data-react-props]"
+    );
     if (!mainEl)
         throw new Error("[Canonical GH] Failed to get the application context");
     const context = JSON.parse(mainEl.getAttribute("data-react-props"));
