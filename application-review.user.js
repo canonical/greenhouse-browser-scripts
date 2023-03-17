@@ -19,29 +19,7 @@ if (location.href.includes("canonical-reload=true"))
     window.location = window.location.href.replace(/&canonical-reload=.+/, "");
 
 checkForNotification();
-
 initActionsDropdown();
-try {
-    addRejectionButton({
-        name: "Wrong timezone",
-        reason: "Wrong timezone",
-        sendEmail: true,
-    });
-    addRejectionButton({
-        name: "Academics",
-        reason: "Academic track record",
-        sendEmail: true,
-    });
-    addRejectionButton({
-        name: "Illegible",
-        note: "Submission not in English",
-        reason: "Other (add notes below)",
-        sendEmail: true,
-    });
-} catch (error) {
-    pushNotification(error.message, true);
-    checkForNotification();
-}
 
 function initActionsDropdown() {
     const rejectBtnEl = document.querySelector("*[data-provides='reject']");
@@ -52,30 +30,25 @@ function initActionsDropdown() {
         /* html */
         `
         <div class="rejection">
-         <button id="lacking-skill-button" class="rejection-button">
+          <button data-name="Lacking skills" data-reason="Lacks domain experience" class="rejection__button">
             Lacking skills
-        </button>
-        <div class="contextual-menu--left">
-            <button class="rejection-button contextual-menu__toggle has-icon" aria-controls="menu-1" aria-expanded="false" aria-haspopup="true">
-                <i class="arrowhead">
-                     <svg width="15" height="10" viewBox="-2.5 -5 45 30" preserveAspectRatio="none">
-                         <path d="M0,0 l15,20 l15,-20" fill="none" stroke="white" stroke-linecap="round" stroke-width="5" />
-                     </svg>
-                </i>
-                <span>Quick rejections</span>
-            </button>
-            <span class="contextual-menu__dropdown" id="menu-1" aria-hidden="true">
-                <span class="contextual-menu__group" id="additional-actions">
-                <!-- Actions will be added here -->
-                </span>
-            </span>
-         </div>
+          </button>
+          <button data-name="Academics" data-reason="Academic track record" class="rejection__button">
+            Lacking Academics
+          </button>
+          <button data-name="Illegible language" data-note="Submission not in English" data-reason="Other (add notes below)" class="rejection__button">
+            Illegible language
+          </button>
+          <button data-name="Wrong timezone" data-reason="Wrong timezone" class="rejection__button">
+            Wrong timezone
+          </button>
         </div>
-    <style>
+        <style>
         .rejection {
            display: flex;
         }
-        .rejection-button {
+
+        .rejection__button {
             height: 36px;
             background-color: #d8372a;
             color: white;
@@ -92,156 +65,67 @@ function initActionsDropdown() {
             align-items: center;
        }
 
-       .rejection-button:hover {
+       .rejection__button:hover {
            background-color: #af2b20;
        }
 
-       .rejection-button[aria-expanded=true] {
+       .rejection__button[aria-expanded=true] {
            background-color: #af2b20;
        }
 
-       .rejection-button:disabled, .rejection-button:disabled:hover {
+       .rejection__button:disabled, .rejection__button:disabled:hover {
            background-color: #767676;
            cursor: not-allowed;
        }
 
-       .contextual-menu__group {
-            display: flex;
-            flex-direction: column;
-            position: absolute;
-            background: white;
-            border: 1px solid rgb(217, 217, 217);
-        }
-
-        .arrowhead {
-           margin-right: 0.3rem;
-           margin-top: 0.2rem;
-        }
-
-        .contextual-menu__link {
-            border: none;
-            outline: none;
-            text-align: left;
-            height: 2rem;
-            width: 7rem;
-            padding: 0 1rem;
-            background: white;
-            cursor: pointer;
-        }
-
-        .contextual-menu__link:hover {
-            background: rgb(225, 225, 225);
-        }
-
-        .contextual-menu__dropdown {
-            display: none;
-        }
-
-
-        .contextual-menu__dropdown[aria-hidden=false] {
-            display: block;
-        }
-
-        .spinner {
-            margin-right: 0.5rem;
-            background: #767676;
-            width: 0.75rem;
-            height: 0.75rem;
-            border: 3px solid white;
-            border-top: 3px solid #767676;
-            border-radius: 50%;
-            transition-property: transform;
-            animation-name: rotate;
-            animation-duration: 1.2s;
-            animation-iteration-count: infinite;
-            animation-timing-function: linear;
+       .spinner {
+           margin-right: 0.5rem;
+           background: #767676;
+           width: 0.75rem;
+           height: 0.75rem;
+           border: 3px solid white;
+           border-top: 3px solid #767676;
+           border-radius: 50%;
+           transition-property: transform;
+           animation-name: rotate;
+           animation-duration: 1.2s;
+           animation-iteration-count: infinite;
+           animation-timing-function: linear;
         }
 
         @-webkit-keyframes rotate {
             from {ransform: rotate(0deg);}
             to {transform: rotate(360deg);}
         }
-    </style>
+        </style>
     `
     );
 
-    // add a listener
-    const rejectionButtonEl = document.getElementById("lacking-skill-button");
-    if (!rejectionButtonEl)
-        throw new Error(
-            "[Canonical GH] Failed to add the rejection button lacking-skill-button"
-        );
-    rejectionButtonEl.addEventListener("click", async () => {
-        try {
-            setQuickRejectionLoading();
-            await reject({
-                name: "Lacking skills",
-                reason: "Lacks domain experience",
-                note: null,
-                startNewProcessAfterRejection: false,
-                sendEmail: true,
-            });
-        } catch (error) {
-            pushNotification(error.message, true);
-            setEnabled();
-            checkForNotification();
-        }
-    });
-}
-
-/**
- * add a rejection button to the addition actions list
- * @param {{
- * name: string,
- * reason: string,
- * note: string|null,
- * startNewProcessAfterRejection: boolean,
- * sendEmail: boolean
- * }}
- */
-function addRejectionButton({
-    name,
-    reason,
-    note = null,
-    startNewProcessAfterRejection = false,
-    sendEmail,
-}) {
-    if (!name || !reason)
-        throw new Error("[Canonical GH] Missing rejection reason");
-    // insert the button to the DOM
-    const actionsListEl = document.getElementById("additional-actions");
-    if (!actionsListEl)
-        throw new Error(
-            "[Canonical GH] Failed to find the custom actions list"
-        );
-    const id = escapeId(name);
-    actionsListEl.insertAdjacentHTML(
-        "afterbegin",
-        /* HTML */
-        `<button class="contextual-menu__link" id="${id}">${name}</button>`
+    const rejectionButtons = document.querySelectorAll(
+        ".rejection__button[data-reason]"
     );
-
-    // add a listener
-    const rejectionButtonEl = document.getElementById(id);
-    if (!rejectionButtonEl)
-        throw new Error(
-            "[Canonical GH] Failed to add the rejection button " + name
-        );
-    rejectionButtonEl.addEventListener("click", async () => {
-        try {
-            setLoading();
-            await reject({
-                name,
-                reason,
-                note,
-                startNewProcessAfterRejection,
-                sendEmail,
-            });
-        } catch (error) {
-            setEnabled();
-            pushNotification(error.message, true);
-            checkForNotification();
-        }
+    rejectionButtons.forEach((rejectionButton) => {
+        rejectionButton.addEventListener("click", async (e) => {
+            try {
+                const element = e.target;
+                const name = element.dataset.name;
+                const note = element.dataset.note ? element.dataset.note : null;
+                const reason = element.dataset.reason;
+                addSpinner(element);
+                setLoading();
+                await reject({
+                    name: name,
+                    reason: reason,
+                    note: note,
+                    startNewProcessAfterRejection: false,
+                    sendEmail: true,
+                });
+            } catch (error) {
+                pushNotification(error.message, true);
+                setEnabled();
+                checkForNotification();
+            }
+        });
     });
 }
 
@@ -534,45 +418,22 @@ function addSpinner(el) {
 }
 
 function setLoading() {
-    const rejectionDropdownEl = document.querySelector(
-        "[aria-controls=menu-1]"
+    const quickRejectionButtons = document.querySelectorAll(
+        ".rejection__button[data-reason]"
     );
-
-    addSpinner(rejectionDropdownEl);
-
-    // close the dropdown menu
-    document.body.click();
-
-    const quickRejectionButton = document.getElementById(
-        "lacking-skill-button"
-    );
-    quickRejectionButton.setAttribute("disabled", "true");
-}
-
-function setQuickRejectionLoading() {
-    const quickRejectionButton = document.getElementById(
-        "lacking-skill-button"
-    );
-    addSpinner(quickRejectionButton);
-
-    const rejectionDropdownEl = document.querySelector(
-        "[aria-controls=menu-1]"
-    );
-    rejectionDropdownEl.setAttribute("disabled", "true");
+    quickRejectionButtons.forEach((quickRejectionButton) => {
+        quickRejectionButton.setAttribute("disabled", "true");
+    });
 }
 
 function setEnabled() {
-    const rejectionDropdownEl = document.querySelector(
-        "[aria-controls=menu-1]"
+    const quickRejectionButtons = document.querySelectorAll(
+        ".rejection__button[data-reason]"
     );
-    rejectionDropdownEl.getElementsByClassName("spinner")[0]?.remove();
-    rejectionDropdownEl.disabled = false;
-
-    const quickRejectionButton = document.getElementById(
-        "lacking-skill-button"
-    );
-    quickRejectionButton.getElementsByClassName("spinner")[0]?.remove();
-    quickRejectionButton.disabled = false;
+    quickRejectionButtons.forEach((quickRejectionButton) => {
+        quickRejectionButton.getElementsByClassName("spinner")[0]?.remove();
+        quickRejectionButton.setAttribute("disabled", "false");
+    });
 }
 
 function pushNotification(message, error = false) {
@@ -672,92 +533,3 @@ function setupCloseButton(closeButton) {
 function removeNotification() {
     localStorage.removeItem("canonical.notification");
 }
-/* Context menu js part */
-/**
-  Toggles the necessary aria- attributes' values on the menus
-  and handles to show or hide them.
-  @param {HTMLElement} element The menu link or button.
-  @param {Boolean} show Whether to show or hide the menu.
-  @param {Number} top Top offset in pixels where to show the menu.
-*/
-function toggleMenu(element, show, top) {
-    var target = document.getElementById(element.getAttribute("aria-controls"));
-
-    if (target) {
-        element.setAttribute("aria-expanded", show);
-        target.setAttribute("aria-hidden", !show);
-
-        if (typeof top !== "undefined") {
-            target.style.top = top + "px";
-        }
-
-        if (show) {
-            target.focus();
-        }
-    }
-}
-
-/**
-  Attaches event listeners for the menu toggle open and close click events.
-  @param {HTMLElement} menuToggle The menu container element.
-*/
-function setupContextualMenu(menuToggle) {
-    menuToggle.addEventListener("click", function (event) {
-        event.preventDefault();
-        var menuAlreadyOpen =
-            menuToggle.getAttribute("aria-expanded") === "true";
-
-        var top = menuToggle.offsetHeight;
-        // for inline elements leave some space between text and menu
-        if (window.getComputedStyle(menuToggle).display === "inline") {
-            top += 5;
-        }
-
-        toggleMenu(menuToggle, !menuAlreadyOpen, top);
-    });
-}
-
-/**
-  Attaches event listeners for all the menu toggles in the document and
-  listeners to handle close when clicking outside the menu or using ESC key.
-  @param {String} contextualMenuToggleSelector The CSS selector matching menu toggle elements.
-*/
-function setupAllContextualMenus(contextualMenuToggleSelector) {
-    // Setup all menu toggles on the page.
-    var toggles = document.querySelectorAll(contextualMenuToggleSelector);
-
-    for (var i = 0, l = toggles.length; i < l; i++) {
-        setupContextualMenu(toggles[i]);
-    }
-
-    // Add handler for clicking outside the menu.
-    document.addEventListener("click", function (event) {
-        for (var i = 0, l = toggles.length; i < l; i++) {
-            var toggle = toggles[i];
-            var contextualMenu = document.getElementById(
-                toggle.getAttribute("aria-controls")
-            );
-            var clickOutside = !(
-                toggle.contains(event.target) ||
-                contextualMenu.contains(event.target)
-            );
-
-            if (clickOutside) {
-                toggleMenu(toggle, false);
-            }
-        }
-    });
-
-    // Add handler for closing menus using ESC key.
-    document.addEventListener("keydown", function (e) {
-        e = e || window.event;
-
-        if (e.keyCode === 27) {
-            for (var i = 0, l = toggles.length; i < l; i++) {
-                toggleMenu(toggles[i], false);
-            }
-        }
-    });
-}
-
-setupAllContextualMenus(".contextual-menu__toggle");
