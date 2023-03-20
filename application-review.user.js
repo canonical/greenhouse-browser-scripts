@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      0.4.0
+// @version      0.5.0
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -129,6 +129,19 @@ function initActionsDropdown() {
     });
 }
 
+function getCurrentApplication() {
+    const applicationLink = document.querySelector('a[href^="/people"');
+    const applicationData = [];
+    if (applicationLink) {
+        const applicationURL = new URL(applicationLink);
+        const urlParams = new URLSearchParams(applicationURL.search);
+        const pathSplit = applicationURL.pathname.split("/");
+        applicationData.person = pathSplit[pathSplit.length - 1];
+        applicationData.id = urlParams.get("application_id");
+        return applicationData;
+    }
+}
+
 /**
  * fill the rejection form and submit
  * @private
@@ -151,8 +164,9 @@ async function reject({
     if (!mainEl)
         throw new Error("[Canonical GH] Failed to get the application context");
     const context = JSON.parse(mainEl.getAttribute("data-react-props"));
-    const applicationId = context.current_application?.id;
-    const personId = context.current_application?.person_id;
+    const currentApplication = getCurrentApplication();
+    const applicationId = currentApplication?.id;
+    const personId = currentApplication?.person;
     const stageId = context.current_application?.current_stage?.app_stage_id;
     if (!(applicationId && stageId && personId))
         throw new Error(
@@ -369,18 +383,14 @@ async function httpGetJson(url, errorMsg) {
 }
 
 async function navigateToNextApplication(applications) {
-    await sleep(1000);
+    await sleep(500);
 
     const nextApplicationEl = document.querySelector("[data-provides*=skip]");
     if (nextApplicationEl && applications.length) {
         nextApplicationEl.click();
         removeNotification();
         pushNotification("Application rejected successfully");
-        // the restart option indicates that once the reload page is done
-        // and the script is loaded, do another reload to update the cached data
-        window.location =
-            window.location.href.replace(/&canonical-reload=.+/, "") +
-            "&canonical-reload=true";
+        setEnabled();
     } else {
         pushNotification("No more applications to review 🎉");
         window.location = window.location.href;
@@ -432,7 +442,7 @@ function setEnabled() {
     );
     quickRejectionButtons.forEach((quickRejectionButton) => {
         quickRejectionButton.getElementsByClassName("spinner")[0]?.remove();
-        quickRejectionButton.setAttribute("disabled", "false");
+        quickRejectionButton.disabled = false;
     });
 }
 
