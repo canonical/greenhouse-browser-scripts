@@ -12,10 +12,10 @@
 // ==/UserScript==
 
 (function () {
-  "use strict";
+    "use strict";
 
-  var divNode = document.createElement("div");
-  divNode.innerHTML = `
+    var divNode = document.createElement("div");
+    divNode.innerHTML = `
   <style>
   [data-provides^="question-"] {
       background-repeat: no-repeat;
@@ -51,212 +51,205 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' aria-hidden='true' alt='No Decision' aria-label='No Decision' class='sc-gsnTZi bgHjIp no-decision'%3E%3Ctitle%3ENo Decision%3C/title%3E%3Cpath d='M2.62805 12C2.62805 17.172 6.82805 21.372 12.0001 21.372C17.1721 21.372 21.3721 17.172 21.3721 12C21.3721 6.82799 17.1721 2.62799 12.0001 2.62799C6.82805 2.62799 2.62805 6.82799 2.62805 12Z' fill='%23E0E5E3'%3E%3C/path%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M12 1.224C6.06 1.224 1.224 6.06 1.224 12C1.224 17.94 6.06 22.776 12 22.776C17.94 22.776 22.776 17.94 22.776 12C22.776 6.06 17.94 1.224 12 1.224ZM12 21.372C6.828 21.372 2.628 17.172 2.628 12C2.628 6.828 6.828 2.628 12 2.628C17.172 2.628 21.372 6.828 21.372 12C21.372 17.172 17.172 21.372 12 21.372ZM12 18.2041C12.5104 18.2041 12.924 17.7905 12.924 17.2801C12.924 16.7698 12.5104 16.3561 12 16.3561C11.4897 16.3561 11.076 16.7698 11.076 17.2801C11.076 17.7905 11.4897 18.2041 12 18.2041ZM8.29196 8.04009C8.71196 6.26409 10.368 4.96809 12.3 5.11209C14.172 5.25609 15.684 6.79209 15.792 8.66409C15.9 10.5601 14.616 12.1801 12.864 12.5881C12.768 12.6121 12.696 12.7081 12.696 12.8041V14.4001C12.696 14.7841 12.384 15.0961 12 15.0961H11.988C11.604 15.0961 11.292 14.7841 11.292 14.4001V11.9401C11.292 11.5801 11.58 11.2921 11.94 11.2921C13.236 11.2921 14.364 10.2481 14.388 8.95209C14.412 7.59609 13.332 6.49209 11.988 6.49209C10.848 6.49209 9.88796 7.28409 9.64796 8.35209C9.57596 8.67609 9.28796 8.89209 8.96396 8.89209C8.51996 8.89209 8.19596 8.47209 8.29196 8.04009Z' fill='%2315372C'%3E%3C/path%3E%3C/svg%3E");
   }
   </style>`;
-  document.body.appendChild(divNode);
+    document.body.appendChild(divNode);
 
-  const reviewContainer = document.querySelector(
-    'div[data-provides="app-review"]'
-  );
+    const reviewContainer = document.querySelector(
+        'div[data-provides="app-review"]'
+    );
 
-  function run() {
-    if (reviewContainer) {
-      const questions = reviewContainer.querySelectorAll(
-        'div[data-provides^="question-"'
-      );
-      questions.forEach(function (question) {
-        const questionText = question.querySelector("strong").innerText;
-        const answer = question.querySelector("p").innerText;
-        clearClass(question);
-        if (questionText.startsWith("Describe")) {
-          question.classList.add(textReview(answer));
-        } else {
-          switch (questionText) {
-            case "Are you due to graduate soon, or have you graduated from university in the past two years?":
-              question.classList.add("q-no-decision");
-              break;
-            case "What time zone are you in?":
-              question.classList.add(locationReview(answer));
-              break;
-            case "What is your degree result? i.e. Upper second, 2.1, 85%, First class, GPA 3.8/4.0 (expected)":
-              question.classList.add(degreeReview(answer));
-              break;
-            case "How did you do in maths, physics or computer science at high school?":
-              question.classList.add(doReview(answer));
-              break;
-            case "How did you do in your native language at high school?":
-              question.classList.add(doReview(answer));
-              break;
-            case "We expect all colleagues to meet in person twice a year, at internal company events. We try to pick interesting and new locations, so this requires international travel for a total of 2-4 weeks per year depending on your responsibilities. Are you willing and able to commit to this?":
-              question.classList.add(yesReview(answer));
-              break;
-            default:
-              question.classList.add("q-no-decision");
-          }
+    function run() {
+        if (reviewContainer) {
+            const questions = reviewContainer.querySelectorAll(
+                'div[data-provides^="question-"'
+            );
+            questions.forEach(function (question) {
+                const questionText = question.querySelector("strong").innerText;
+                const answer = question.querySelector("p").innerText;
+                clearClass(question);
+                if (questionText.startsWith("Describe")) {
+                    question.classList.add(textReview(answer));
+                } else {
+                    switch (questionText) {
+                        case "Are you due to graduate soon, or have you graduated from university in the past two years?":
+                            question.classList.add("q-no-decision");
+                            break;
+                        case "What time zone are you in?":
+                            return "q-no-decision";
+                            break;
+                        case "What is your degree result? i.e. Upper second, 2.1, 85%, First class, GPA 3.8/4.0 (expected)":
+                            question.classList.add(degreeReview(answer));
+                            break;
+                        case "How did you do in maths, physics or computer science at high school?":
+                            question.classList.add(doReview(answer));
+                            break;
+                        case "How did you do in your native language at high school?":
+                            question.classList.add(doReview(answer));
+                            break;
+                        case "We expect all colleagues to meet in person twice a year, at internal company events. We try to pick interesting and new locations, so this requires international travel for a total of 2-4 weeks per year depending on your responsibilities. Are you willing and able to commit to this?":
+                            question.classList.add(yesReview(answer));
+                            break;
+                        default:
+                            question.classList.add("q-no-decision");
+                    }
+                }
+            });
         }
-      });
     }
-  }
 
-  function textReview(answer) {
-    if (answer.length < 10) {
-      return "q-strong-no";
-    } else if (answer.length < 50) {
-      return "q-no";
-    } else if (answer.length >= 50) {
-      return "q-yes";
+    function textReview(answer) {
+        if (answer.length < 10) {
+            return "q-strong-no";
+        } else if (answer.length < 50) {
+            return "q-no";
+        } else if (answer.length >= 50) {
+            return "q-yes";
+        }
+        return "q-no-decision";
     }
-    return "q-no-decision";
-  }
 
-  function locationReview(answer) {
-    if (answer === "Europe, Middle East or Africa Time Zones") {
-      return "q-yes";
+    function degreeReview(answer) {
+        var prohibited = ["drop", "none", "didnt", "cannot", "second", "n/a"];
+        for (var i = 0; i < prohibited.length; i++) {
+            if (answer.toLowerCase().indexOf(prohibited[i]) !== -1) {
+                return "q-strong-no";
+            }
+        }
+        if (answer.trim() === "0") {
+            return "q-strong-no";
+        }
+        if (!isNaN(answer) && answer.startsWith("3")) {
+            var result = GPACheck(answer);
+            if (result) {
+                return result;
+            }
+            return "q-strong-no";
+        }
+        if (answer.includes("GPA")) {
+            var splitBySpace = answer.split(" ");
+            var index = splitBySpace.indexOf("GPA");
+            var score = splitBySpace[index + 1];
+            var GPACheckResult = GPACheck(score);
+            if (GPACheckResult) {
+                return GPACheckResult;
+            }
+        }
+        if (answer.includes("/")) {
+            const result = checkFractional(answer);
+            if (result) {
+                return result;
+            }
+        }
+        if (answer === "-" || answer === "--") {
+            return "q-strong-no";
+        }
+        if (answer === "2:1") {
+            return "q-no";
+        }
+        if (answer === "2:2") {
+            return "q-strong-no";
+        }
+        if (answer.endsWith("%")) {
+            return percentToResult(answer.split("%")[0]);
+        }
+        if (
+            answer === "3.8" ||
+            answer === "3.9" ||
+            answer === "4.0" ||
+            answer === "90%" ||
+            answer === "0" ||
+            answer === "100%" ||
+            answer.toLowerCase() === "first" ||
+            answer.toLowerCase() === "first class"
+        ) {
+            return "q-strong-yes";
+        }
+
+        return "q-no-decision";
     }
-    return "q-no-decision";
-  }
 
-  function degreeReview(answer) {
-    var prohibited = ["drop", "none", "didnt", "cannot", "second", "n/a"];
-    for (var i = 0; i < prohibited.length; i++) {
-      if (answer.toLowerCase().indexOf(prohibited[i]) !== -1) {
+    function GPACheck(answer) {
+        if (!isNaN(answer) && answer.startsWith("3.")) {
+            const point = parseInt(answer.replace("3.", "")[0]);
+            if (point >= 8 || answer === "4.0") {
+                return "q-strong-yes";
+            }
+            if (point >= 7) {
+                return "q-yes";
+            }
+            if (point >= 6) {
+                return "q-no";
+            }
+        }
+
+        if (
+            !isNaN(answer) &&
+            (answer.startsWith("2.") || answer.startsWith("3."))
+        ) {
+            return "q-strong-no";
+        }
+        return false;
+    }
+
+    function checkFractional(answer) {
+        const splitBySpace = answer.split(" ");
+        const fraction = splitBySpace.find((part) => part.includes("/"));
+        const split = fraction.split("/");
+        if (split.length === 2) {
+            if (!isNaN(split[0]) && !isNaN(split[1])) {
+                let percent = (split[0] / split[1]) * 100;
+                return percentToResult(percent);
+            }
+        }
+    }
+
+    function percentToResult(percent) {
+        if (parseInt(percent) > 90) {
+            return "q-strong-yes";
+        }
+        if (parseInt(percent) > 80) {
+            return "q-yes";
+        }
+        if (parseInt(percent) > 65) {
+            return "q-no";
+        }
         return "q-strong-no";
-      }
-    }
-    if (answer.trim() === "0") {
-      return "q-strong-no";
-    }
-    if (!isNaN(answer) && answer.startsWith("3")) {
-      var result = GPACheck(answer);
-      if (result) {
-        return result;
-      }
-      return "q-strong-no";
-    }
-    if (answer.includes("GPA")) {
-      var splitBySpace = answer.split(" ");
-      var index = splitBySpace.indexOf("GPA");
-      var score = splitBySpace[index + 1];
-      var GPACheckResult = GPACheck(score);
-      if (GPACheckResult) {
-        return GPACheckResult;
-      }
-    }
-    if (answer.includes("/")) {
-      const result = checkFractional(answer);
-      if (result) {
-        return result;
-      }
-    }
-    if (answer === "-" || answer === "--") {
-      return "q-strong-no";
-    }
-    if (answer === "2:1") {
-      return "q-no";
-    }
-    if (answer === "2:2") {
-      return "q-strong-no";
-    }
-    if (answer.endsWith("%")) {
-      return percentToResult(answer.split("%")[0]);
-    }
-    if (
-      answer === "3.8" ||
-      answer === "3.9" ||
-      answer === "4.0" ||
-      answer === "90%" ||
-      answer === "0" ||
-      answer === "100%" ||
-      answer.toLowerCase() === "first" ||
-      answer.toLowerCase() === "first class"
-    ) {
-      return "q-strong-yes";
     }
 
-    return "q-no-decision";
-  }
-
-  function GPACheck(answer) {
-    if (!isNaN(answer) && answer.startsWith("3.")) {
-      const point = parseInt(answer.replace("3.", "")[0]);
-      if (point >= 8 || answer === "4.0") {
-        return "q-strong-yes";
-      }
-      if (point >= 7) {
-        return "q-yes";
-      }
-      if (point >= 6) {
-        return "q-no";
-      }
+    function doReview(answer) {
+        if (answer === "Top student") {
+            return "q-strong-yes";
+        }
+        if (answer === "Top 5%" || answer === "Top 10%") {
+            return "q-yes";
+        }
+        if (answer === "Top 20%" || answer === "Top 50%") {
+            return "q-no";
+        }
+        if (answer === "Cannot recall" || answer === "Not a strength") {
+            return "q-strong-no";
+        }
+        return "q-no-decision";
     }
 
-    if (
-      !isNaN(answer) &&
-      (answer.startsWith("2.") || answer.startsWith("3."))
-    ) {
-      return "q-strong-no";
+    function yesReview(answer) {
+        if (answer === "Yes") {
+            return "q-yes";
+        } else {
+            return "q-strong-no";
+        }
     }
-    return false;
-  }
 
-  function checkFractional(answer) {
-    const splitBySpace = answer.split(" ");
-    const fraction = splitBySpace.find((part) => part.includes("/"));
-    const split = fraction.split("/");
-    if (split.length === 2) {
-      if (!isNaN(split[0]) && !isNaN(split[1])) {
-        let percent = (split[0] / split[1]) * 100;
-        return percentToResult(percent);
-      }
+    function clearClass(element) {
+        element.classList.remove("q-strong-no");
+        element.classList.remove("q-no");
+        element.classList.remove("q-no-decision");
+        element.classList.remove("q-yes");
+        element.classList.remove("q-strong-yes");
     }
-  }
 
-  function percentToResult(percent) {
-    if (parseInt(percent) > 90) {
-      return "q-strong-yes";
-    }
-    if (parseInt(percent) > 80) {
-      return "q-yes";
-    }
-    if (parseInt(percent) > 65) {
-      return "q-no";
-    }
-    return "q-strong-no";
-  }
+    reviewContainer.addEventListener("DOMSubtreeModified", function () {
+        setTimeout(run, 0);
+    });
 
-  function doReview(answer) {
-    if (answer === "Top student") {
-      return "q-strong-yes";
-    }
-    if (answer === "Top 5%" || answer === "Top 10%") {
-      return "q-yes";
-    }
-    if (answer === "Top 20%" || answer === "Top 50%") {
-      return "q-no";
-    }
-    if (answer === "Cannot recall" || answer === "Not a strength") {
-      return "q-strong-no";
-    }
-    return "q-no-decision";
-  }
-
-  function yesReview(answer) {
-    if (answer === "Yes") {
-      return "q-yes";
-    } else {
-      return "q-strong-no";
-    }
-  }
-
-  function clearClass(element) {
-    element.classList.remove("q-strong-no");
-    element.classList.remove("q-no");
-    element.classList.remove("q-no-decision");
-    element.classList.remove("q-yes");
-    element.classList.remove("q-strong-yes");
-  }
-
-  reviewContainer.addEventListener("DOMSubtreeModified", function () {
-    setTimeout(run, 0);
-  });
-
-  run();
+    run();
 })();
