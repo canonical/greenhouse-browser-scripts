@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      0.5.0
+// @version      0.6.0
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -15,10 +15,15 @@
 // ==/UserScript==
 
 // reload the page if requested by previous operations
-if (location.href.includes("canonical-reload=true"))
+if (location.href.includes("canonical-reload=true")) {
     window.location = window.location.href.replace(/&canonical-reload=.+/, "");
+}
 
-checkForNotification();
+const mainEl = document.querySelector("#app_review_wrapper [data-react-props]");
+if (!mainEl)
+    throw new Error("[Canonical GH] Failed to get the application context");
+const context = JSON.parse(mainEl.getAttribute("data-react-props"));
+
 initActionsDropdown();
 
 function initActionsDropdown() {
@@ -34,7 +39,7 @@ function initActionsDropdown() {
             Lacking skills
           </button>
           <button data-name="Academics" data-reason="Academic track record" class="rejection__button">
-            Lacking Academics
+            Lacking academics
           </button>
           <button data-name="Illegible language" data-note="Submission not in English" data-reason="Other (add notes below)" class="rejection__button">
             Illegible language
@@ -83,6 +88,7 @@ function initActionsDropdown() {
            background: #767676;
            width: 0.75rem;
            height: 0.75rem;
+           min-width: 0.75rem;
            border: 3px solid white;
            border-top: 3px solid #767676;
            border-radius: 50%;
@@ -121,9 +127,8 @@ function initActionsDropdown() {
                     sendEmail: true,
                 });
             } catch (error) {
-                pushNotification(error.message, true);
+                console.error(error.message);
                 setEnabled();
-                checkForNotification();
             }
         });
     });
@@ -158,12 +163,6 @@ async function reject({
     note = null,
     startNewProcessAfterRejection = false,
 }) {
-    const mainEl = document.querySelector(
-        "#app_review_wrapper [data-react-props]"
-    );
-    if (!mainEl)
-        throw new Error("[Canonical GH] Failed to get the application context");
-    const context = JSON.parse(mainEl.getAttribute("data-react-props"));
     const currentApplication = getCurrentApplication();
     const applicationId = currentApplication?.id;
     const personId = currentApplication?.person;
@@ -243,13 +242,10 @@ async function reject({
             referrerPolicy: "strict-origin-when-cross-origin",
         }
     );
-    if (!response.ok)
+    if (!response.ok) {
         throw new Error("[Canonical GH] Invalid rejection payload");
-    await navigateToNextApplication(
-        context.applications.filter(
-            (application) => application.id !== applicationId
-        )
-    );
+    }
+    await navigateToNextApplication(context.applications);
 }
 
 /**
@@ -384,15 +380,14 @@ async function httpGetJson(url, errorMsg) {
 
 async function navigateToNextApplication(applications) {
     await sleep(500);
-
     const nextApplicationEl = document.querySelector("[data-provides*=skip]");
-    if (nextApplicationEl && applications.length) {
+    const disabled = nextApplicationEl.ariaDisabled === "true";
+    if (nextApplicationEl && !disabled) {
+        console.log("No reload");
         nextApplicationEl.click();
-        removeNotification();
-        pushNotification("Application rejected successfully");
         setEnabled();
     } else {
-        pushNotification("No more applications to review 🎉");
+        console.log("Reload");
         window.location = window.location.href;
     }
 }
@@ -400,9 +395,6 @@ async function navigateToNextApplication(applications) {
 /*--------------------------------------------------*/
 /*                    Utilities                     */
 /*--------------------------------------------------*/
-function escapeId(name) {
-    return "canonical-" + name.replace(/(-|\/|,|\s)/gi, "-");
-}
 function getCSRFToken() {
     return document
         .querySelector("meta[name=csrf-token]")
@@ -444,102 +436,4 @@ function setEnabled() {
         quickRejectionButton.getElementsByClassName("spinner")[0]?.remove();
         quickRejectionButton.disabled = false;
     });
-}
-
-function pushNotification(message, error = false) {
-    localStorage.setItem(
-        "canonical.notification",
-        JSON.stringify({
-            message: message.replace("[Canonical GH] ", ""),
-            error,
-        })
-    );
-}
-
-function checkForNotification() {
-    const notification = localStorage.getItem("canonical.notification");
-    if (!notification) return;
-
-    const { message, error } = JSON.parse(notification);
-    document.body.insertAdjacentHTML(
-        "afterbegin",
-        /* HTML */
-        `
-            <div
-                class="notification--${error ? "negative" : "positive"}"
-                id="notification"
-            >
-                <div class="notification__content">
-                    <h5 class="notification__title">${message}</h5>
-                    <p class="notification__message">Canonical automation</p>
-                    <button
-                        class="notification__close"
-                        aria-controls="notification"
-                    >
-                        X
-                    </button>
-                </div>
-            </div>
-            <style>
-                #notification {
-                    z-index: 9999;
-                    max-width: 20rem;
-                    padding: 0.5rem 3rem;
-                    margin: 1rem;
-                    position: fixed;
-                    right: 0;
-                    top: 0;
-                    background: white;
-                    border-left: 0.5rem solid #008561;
-                    border-radius: 2px;
-                }
-
-                .notification__close {
-                    border: none;
-                    background: transparent;
-                    cursor: pointer;
-                    position: absolute;
-                    right: 0.5rem;
-                    top: 0.5rem;
-                    font-size: 1rem;
-                }
-
-                .u-hide {
-                    display: none;
-                }
-            </style>
-        `
-    );
-    // Set up all notification close buttons.
-    var closeButtons = document.querySelectorAll(".notification__close");
-
-    for (var i = 0, l = closeButtons.length; i < l; i++) {
-        setupCloseButton(closeButtons[i]);
-    }
-    // Auto close after 5 seconds
-    setTimeout(() => {
-        closeButtons.forEach((button) => button.click());
-    }, 5 * 1000);
-}
-
-/* Dismissible notification js part */
-/**
- * Attaches event listener for hide notification on close button click.
- * @param {HTMLElement} closeButton The notification close button element.
- */
-function setupCloseButton(closeButton) {
-    closeButton.addEventListener("click", function (event) {
-        var target = event.target.getAttribute("aria-controls");
-        var notification = document.getElementById(target);
-
-        if (notification) {
-            notification.classList.add("u-hide");
-        }
-
-        removeNotification();
-    });
-}
-
-function removeNotification() {
-    localStorage.removeItem("canonical.notification");
 }
