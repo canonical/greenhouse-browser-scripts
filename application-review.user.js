@@ -61,35 +61,26 @@
                 option.dispatchEvent(mouseDown);
             }
         });
-
-        const waitRecover = setTimeout(() => {
-            rejectModal.classList.remove("hide-modal");
-            setEnabled();
-        }, 5000);
-
-        MutationObserver =
-            window.MutationObserver || window.WebKitMutationObserver;
-        var observer = new MutationObserver(function (mutations) {
-            mutations.forEach((element) => {
-                if (
-                    element.target?.previousElementSibling?.innerText ===
-                    "Subject"
-                ) {
-                    rejectButton.click();
-                    clearTimeout(waitRecover);
-                    setEnabled();
-                    setTimeout(
-                        () => rejectModal.classList.remove("hide-modal"),
-                        500
-                    );
-                }
-            });
+        let subjectInput;
+        const inputs = rejectModal.querySelectorAll(
+            '#reject-modal input[type="text"]'
+        );
+        inputs.forEach((input) => {
+            if (input.previousElementSibling?.innerText === "Subject") {
+                subjectInput = input;
+            }
         });
-
-        observer.observe(rejectModal, {
-            subtree: true,
-            attributes: true,
-        });
+        const rejectChecker = setInterval(() => {
+            if (subjectInput.value !== "") {
+                clearInterval(rejectChecker);
+                rejectButton.click();
+                setEnabled();
+                setTimeout(
+                    () => rejectModal.classList.remove("hide-modal"),
+                    500
+                );
+            }
+        }, 500);
     }
 
     // State utilities
