@@ -62,6 +62,11 @@
             }
         });
 
+        const waitRecover = setTimeout(() => {
+            rejectModal.classList.remove("hide-modal");
+            setEnabled();
+        }, 5000);
+
         MutationObserver =
             window.MutationObserver || window.WebKitMutationObserver;
         var observer = new MutationObserver(function (mutations) {
@@ -71,6 +76,7 @@
                     "Subject"
                 ) {
                     rejectButton.click();
+                    clearTimeout(waitRecover);
                     setEnabled();
                     setTimeout(
                         () => rejectModal.classList.remove("hide-modal"),
