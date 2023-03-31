@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      1.0.0
+// @version      1.0.1
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -61,29 +61,26 @@
                 option.dispatchEvent(mouseDown);
             }
         });
-
-        MutationObserver =
-            window.MutationObserver || window.WebKitMutationObserver;
-        var observer = new MutationObserver(function (mutations) {
-            mutations.forEach((element) => {
-                if (
-                    element.target?.previousElementSibling?.innerText ===
-                    "Subject"
-                ) {
-                    rejectButton.click();
-                    setEnabled();
-                    setTimeout(
-                        () => rejectModal.classList.remove("hide-modal"),
-                        500
-                    );
-                }
-            });
+        let subjectInput;
+        const inputs = rejectModal.querySelectorAll(
+            '#reject-modal input[type="text"]'
+        );
+        inputs.forEach((input) => {
+            if (input.previousElementSibling?.innerText === "Subject") {
+                subjectInput = input;
+            }
         });
-
-        observer.observe(rejectModal, {
-            subtree: true,
-            attributes: true,
-        });
+        const rejectChecker = setInterval(() => {
+            if (subjectInput.value !== "") {
+                clearInterval(rejectChecker);
+                rejectButton.click();
+                setEnabled();
+                setTimeout(
+                    () => rejectModal.classList.remove("hide-modal"),
+                    500
+                );
+            }
+        }, 500);
     }
 
     // State utilities
