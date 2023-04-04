@@ -3,6 +3,18 @@
         "browser": true,
         "commonjs": true,
         "es2021": true
+        // "allowImportExportEverywhere": true
     },
-    "extends": ["eslint:recommended", "plugin:userscripts/recommended"]
+    "parserOptions": {
+        "ecmaVersion": "latest", // Allows the use of modern ECMAScript features
+        "sourceType": "module" // Allows for the use of imports
+    },
+    // "parserOptions": {
+    //     // "sourceType": "module",
+    //     "allowImportExportEverywhere": true
+    // },
+    "extends": [
+        "eslint:recommended"
+        // "plugin:userscripts/recommended"
+    ]
 }
