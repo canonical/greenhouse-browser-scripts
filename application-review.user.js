@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      1.0.1
+// @version      1.0.2
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -46,12 +46,21 @@
         rejectBtnEl.click();
         const rejectModal = document.querySelector("#reject-modal");
         rejectModal.classList.add("hide-modal");
+        const sendEmailInput = rejectModal.querySelector("#send-email");
+        if (!sendEmailInput.checked) {
+            sendEmailInput.click();
+        }
         const rejectButton = rejectModal.querySelector(
             'a[title="Reject this candidate"]'
         );
-        const reasonSelector = rejectModal.querySelector(
+        let reasonSelector = rejectModal.querySelector(
             "[data-provides='reject-reason-dropdown'] .Select-value-label"
         );
+        if (!reasonSelector) {
+            reasonSelector = rejectModal.querySelector(
+                "[data-provides='reject-reason-dropdown'] .Select-placeholder"
+            );
+        }
         reasonSelector.dispatchEvent(keyDown);
         const reasonOption = rejectModal.querySelectorAll(
             ".Select-menu-outer .Select-option"
