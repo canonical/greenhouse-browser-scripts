@@ -99,11 +99,10 @@
     function textReview(answer) {
         if (answer.length < 10) {
             return "q-strong-no";
-        } else if (answer.length < 50) {
-            return "q-no";
-        } else if (answer.length >= 50) {
-            return "q-yes";
         }
+        if (answer.length < 50) {
+            return "q-no";
+        } 
         return "q-no-decision";
     }
 
