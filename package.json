@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "@testing-library/jest-dom": "^5.16.5",
+        "jest-environment-node": "^29.5.0",
         "jsdom": "^21.1.1"
     }
 }

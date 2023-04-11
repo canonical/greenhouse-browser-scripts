@@ -13,8 +13,8 @@ module.exports = {
     forceExit: true,
 
     // // The test environment that will be used for testing
-    testEnvironment: "jsdom",
-    // testEnvironment: "jest-environment-jsdom",
+    // testEnvironment: "jsdom",
+    testEnvironment: "jest-environment-jsdom",
 
     TextEncoder: require("util").TextEncoder,
     TextDecoder: require("util").TextDecoder,

@@ -14,18 +14,24 @@
 // @match        https://canonical.greenhouse.io/applications/review/app_review*
 // ==/UserScript==
 
-(function () {
+let keyDown;
+let mouseDown;
+
+let rejectBtnEl;
+let actionsBarEl;
+
+function addQuickReviewBtns() {
     "use strict";
 
-    const rejectBtnEl = document.querySelector("*[data-provides='reject']");
-    const actionsBarEl = rejectBtnEl.parentNode;
+    rejectBtnEl = document.querySelector("*[data-provides='reject']");
+    actionsBarEl = rejectBtnEl.parentNode;
 
-    const keyDown = new KeyboardEvent("keydown", {
+    keyDown = new KeyboardEvent("keydown", {
         bubbles: true,
         cancelable: true,
         keyCode: 13,
     });
-    const mouseDown = new MouseEvent("mousedown", {
+    mouseDown = new MouseEvent("mousedown", {
         bubbles: true,
         cancelable: true,
     });
@@ -37,6 +43,7 @@
         .forEach((rejectionButton) => {
             rejectionButton.addEventListener("click", handleRejectClick);
         });
+    // }
 
     function handleRejectClick(e) {
         const element = e.target;
@@ -199,4 +206,7 @@
 `
         );
     }
-})();
+}
+
+// window.onload = addQuickReviewBtns();
+addQuickReviewBtns();
