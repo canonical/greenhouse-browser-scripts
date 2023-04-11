@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review Helper
 // @namespace    https://canonical.com/
-// @version      0.1.8
+// @version      0.1.9
 // @description  Add's hints to application custom question answers
 // @author       Anthony Dillon
 // @icon         https://icons.duckduckgo.com/ip3/greenhouse.io.ico
@@ -99,11 +99,10 @@
     function textReview(answer) {
         if (answer.length < 10) {
             return "q-strong-no";
-        } else if (answer.length < 50) {
-            return "q-no";
-        } else if (answer.length >= 50) {
-            return "q-yes";
         }
+        if (answer.length < 50) {
+            return "q-no";
+        } 
         return "q-no-decision";
     }
 
