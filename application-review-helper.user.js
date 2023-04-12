@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review Helper
 // @namespace    https://canonical.com/
-// @version      0.1.9
+// @version      0.1.10
 // @description  Add's hints to application custom question answers
 // @author       Anthony Dillon
 // @icon         https://icons.duckduckgo.com/ip3/greenhouse.io.ico
@@ -74,7 +74,7 @@
                             question.classList.add("q-no-decision");
                             break;
                         case "What time zone are you in?":
-                            return "q-no-decision";
+                            question.classList.add("q-no-decision");
                             break;
                         case "What is your degree result? i.e. Upper second, 2.1, 85%, First class, GPA 3.8/4.0 (expected)":
                             question.classList.add(degreeReview(answer));
