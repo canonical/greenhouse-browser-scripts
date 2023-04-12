@@ -64,10 +64,4 @@ describe("Pdf in a new tab suite", () => {
             })
         );
     });
-
-    it("blob?", () => {
-        let uu = window.navigator.pdfViewerEnabled;
-        let uu2 = window.navigator.storage;
-        console.log("UUUU ::  ", uu, uu2);
-    });
 });
