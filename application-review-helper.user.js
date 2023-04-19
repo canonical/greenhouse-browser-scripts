@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Greenhouse Application Review Helper
+// @name         Greenhouse Application Review Helper - locall
 // @namespace    https://canonical.com/
 // @version      0.1.8
 // @description  Add's hints to application custom question answers
@@ -11,7 +11,18 @@
 // @match        https://canonical.greenhouse.io/applications/review/*
 // ==/UserScript==
 
-(function () {
+function textReview(answer) {
+    if (answer.length < 10) {
+        return "q-strong-no";
+    } else if (answer.length < 50) {
+        return "q-no";
+    } else if (answer.length >= 50) {
+        return "q-yes";
+    }
+    return "q-no-decision";
+}
+
+function AppReviewHelper() {
     "use strict";
 
     var divNode = document.createElement("div");
@@ -96,16 +107,16 @@
         }
     }
 
-    function textReview(answer) {
-        if (answer.length < 10) {
-            return "q-strong-no";
-        } else if (answer.length < 50) {
-            return "q-no";
-        } else if (answer.length >= 50) {
-            return "q-yes";
-        }
-        return "q-no-decision";
-    }
+    // function textReview(answer) {
+    //     if (answer.length < 10) {
+    //         return "q-strong-no";
+    //     } else if (answer.length < 50) {
+    //         return "q-no";
+    //     } else if (answer.length >= 50) {
+    //         return "q-yes";
+    //     }
+    //     return "q-no-decision";
+    // }
 
     function degreeReview(answer) {
         var prohibited = ["drop", "none", "didnt", "cannot", "second", "n/a"];
@@ -247,9 +258,11 @@
         element.classList.remove("q-strong-yes");
     }
 
-    reviewContainer.addEventListener("DOMSubtreeModified", function () {
-        setTimeout(run, 0);
-    });
+    if (document.querySelector("DOMSubtreeModified"))
+        reviewContainer.addEventListener("DOMSubtreeModified", function () {
+            setTimeout(run, 0);
+        });
 
     run();
-})();
+}
+if (window.screen) AppReviewHelper();

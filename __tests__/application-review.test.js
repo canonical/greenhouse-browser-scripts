@@ -104,7 +104,6 @@ describe("application review test suite", () => {
     it("Rejection buttons are rendered 2 ", () => {
         const rejectBtnEl = document.querySelector("*[data-provides='reject']");
 
-        console.log("REJECT BTNS EL :: ", rejectBtnEl);
         expect(rejectBtnEl).not.toBeNull();
         // expect(quickRejectionButtons).toHaveLength(4);
     });
