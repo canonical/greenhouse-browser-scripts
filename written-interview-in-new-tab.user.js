@@ -12,6 +12,7 @@
 // @supportURL   https://github.com/canonical/greenhouse-browser-scripts/issues
 
 // @match        https://canonical.greenhouse.io/guides/**/people/**
+// @match        https://canonical.greenhouse.io/scorecards/**
 // ==/UserScript==
 
 const downloadLinks = [
