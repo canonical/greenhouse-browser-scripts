@@ -66,7 +66,7 @@
             ".Select-menu-outer .Select-option"
         );
         reasonOption.forEach(function (option) {
-            if (option.ariaLabel === reason) {
+            if (option.getAttribute("aria-label") === reason) {
                 option.dispatchEvent(mouseDown);
             }
         });
