@@ -140,8 +140,8 @@
       <button data-name="Illegible language" data-reason="Illegible language" class="rejection__button">
         Illegible language
       </button>
-      <button data-name="Wrong timezone" data-reason="Wrong timezone" class="rejection__button">
-        Wrong timezone
+      <button data-name="Jumpy career" data-reason="Jumpy career" class="rejection__button">
+        Jumpy career
       </button>
     </div>
     <style>
