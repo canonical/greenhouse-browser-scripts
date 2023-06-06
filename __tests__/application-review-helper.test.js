@@ -129,6 +129,8 @@ describe("Application review helper tests", () => {
         const answerSixteen = "70%";
         const answerSeventeen = "50%";
         const answerEighteen = "first class";
+        const answerNineteen = "GPA 3.00/4.00";
+        const answerTwenty = "GPA: 3.90/4.00";
 
         const answerArray = [
             answerOne,
@@ -149,6 +151,8 @@ describe("Application review helper tests", () => {
             answerSixteen,
             answerSeventeen,
             answerEighteen,
+            answerNineteen,
+            answerTwenty,
         ];
 
         for (let i = 0; i < answerArray.length; i++) {
@@ -210,6 +214,12 @@ describe("Application review helper tests", () => {
                     expect(addedClassName).toBe(classNamePecise);
                     break;
                 case answerEighteen:
+                    expect(addedClassName).toBe(classNamePebble);
+                    break;
+                case answerNineteen:
+                    expect(addedClassName).toBe(classNameMamba);
+                    break;
+                case answerTwenty:
                     expect(addedClassName).toBe(classNamePebble);
                     break;
                 default:

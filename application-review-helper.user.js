@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review Helper
 // @namespace    https://canonical.com/
-// @version      0.1.11
+// @version      0.1.12
 // @description  Add's hints to application custom question answers
 // @author       Anthony Dillon
 // @icon         https://icons.duckduckgo.com/ip3/greenhouse.io.ico
@@ -124,7 +124,8 @@
             return "pecise";
         }
         if (answer.includes("GPA")) {
-            var splitBySpace = answer.split(" ");
+            var removeColon = answer.replace(":", "");
+            var splitBySpace = removeColon.split(" ");
             var index = splitBySpace.indexOf("GPA");
             var score = splitBySpace[index + 1];
             var GPACheckResult = GPACheck(score);
