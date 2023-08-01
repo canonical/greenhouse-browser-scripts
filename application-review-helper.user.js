@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review Helper
 // @namespace    https://canonical.com/
-// @version      0.1.12
+// @version      0.1.13
 // @description  Add's hints to application custom question answers
 // @author       Anthony Dillon
 // @icon         https://icons.duckduckgo.com/ip3/greenhouse.io.ico
@@ -79,10 +79,19 @@
                         case /What is your degree result\?/.test(questionText):
                             question.classList.add(degreeReview(answer));
                             break;
+                        case /What was your Bachelors university degree result*/.test(questionText):
+                            question.classList.add(degreeReview(answer));
+                            break;
                         case /How did you do in maths, physics or computer science at high school\?/.test(questionText):
                             question.classList.add(doReview(answer));
                             break;
+                        case /How did you perform in mathematics at high school\?/.test(questionText):
+                            question.classList.add(doReview(answer));
+                            break;
                         case /How did you do in your native language at high school\?/.test(questionText):
+                            question.classList.add(doReview(answer));
+                            break;
+                        case /How did you perform in your native language at high school\?/.test(questionText):
                             question.classList.add(doReview(answer));
                             break;
                         case /We expect all colleagues to meet in person twice a year.* Are you willing and able to commit to this\?/.test(questionText):
