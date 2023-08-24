@@ -76,13 +76,13 @@
                         case /What time zone are you in\?/.test(questionText):
                             question.classList.add("elephant");
                             break;
-                        case /What is your degree result\?/.test(questionText):
+                        case /What was your bachelor's university degree result.*\?/.test(questionText):
                             question.classList.add(degreeReview(answer));
                             break;
-                        case /How did you do in maths, physics or computer science at high school\?/.test(questionText):
+                        case /How did you perform in mathematics at high school\?/.test(questionText):
                             question.classList.add(doReview(answer));
                             break;
-                        case /How did you do in your native language at high school\?/.test(questionText):
+                        case /How did you perform in your native language at high school?\?/.test(questionText):
                             question.classList.add(doReview(answer));
                             break;
                         case /We expect all colleagues to meet in person twice a year.* Are you willing and able to commit to this\?/.test(questionText):
