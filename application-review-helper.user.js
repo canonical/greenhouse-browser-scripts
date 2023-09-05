@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review Helper
 // @namespace    https://canonical.com/
-// @version      0.1.13
+// @version      0.1.14
 // @description  Add's hints to application custom question answers
 // @author       Anthony Dillon
 // @icon         https://icons.duckduckgo.com/ip3/greenhouse.io.ico
@@ -68,6 +68,8 @@
                 clearClass(question);
                 if (questionText.startsWith("Describe")) {
                     question.classList.add(textReview(answer));
+                } else if (questionText.startsWith("What was your bachelor's university degree result")) {
+                    question.classList.add(degreeReview(answer)); 
                 } else {
                     switch (true) {
                         case /Are you due to graduate soon, or have you graduated from university in the past two years\?/.test(questionText):
