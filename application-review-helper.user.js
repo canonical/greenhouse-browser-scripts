@@ -82,6 +82,9 @@
                         case /What was your Bachelors university degree result*/.test(questionText):
                             question.classList.add(degreeReview(answer));
                             break;
+                        case /What was your bachelor's university degree result*/.test(questionText):
+                            question.classList.add(degreeReview(answer));
+                            break;
                         case /How did you do in maths, physics or computer science at high school\?/.test(questionText):
                             question.classList.add(doReview(answer));
                             break;
@@ -225,7 +228,7 @@
     }
 
     function doReview(answer) {
-        if (answer === "Top student") {
+        if (answer === "Top student" || answer === "Top student at school" || answer === "Top 1% in the region" || answer === "Top 0.1% in the region") {
             return "pebble";
         }
         if (answer === "Top 5%" || answer === "Top 10%") {
