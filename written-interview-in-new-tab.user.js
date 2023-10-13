@@ -19,6 +19,13 @@ const downloadLinks = Array.from(document.querySelectorAll(
   "a[data-download-url*='person_attachments/downloads']"
 )).filter(el => el.textContent.endsWith(".pdf"));
 
+//   [
+//     ...document.querySelectorAll(
+//         "a[data-download-url*='person_attachments/downloads']"
+//     ),
+// ];
+
+
 downloadLinks.forEach((linkEl) => {
     // remove existing React listeners
     const newLinkEl = linkEl.cloneNode(true);
