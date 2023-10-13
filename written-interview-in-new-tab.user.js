@@ -15,11 +15,10 @@
 // @match        https://canonical.greenhouse.io/scorecards/**
 // ==/UserScript==
 
-const downloadLinks = [
-    ...document.querySelectorAll(
-        "a[data-download-url*='person_attachments/downloads']"
-    ),
-];
+const downloadLinks = Array.from(document.querySelectorAll(
+  "a[data-download-url*='person_attachments/downloads']"
+)).filter(el => el.textContent.endsWith(".pdf"));
+
 downloadLinks.forEach((linkEl) => {
     // remove existing React listeners
     const newLinkEl = linkEl.cloneNode(true);
