@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse written interviews in a new tab
 // @namespace    https://canonical.com/
-// @version      1.0.0
+// @version      1.0.1
 // @author       Canonical's workplace engineering team
 // @description  Open written interviews in a new tab instead of downloading "File1.pdf" files.
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
