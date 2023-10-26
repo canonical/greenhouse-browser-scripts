@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse written interviews in a new tab
 // @namespace    https://canonical.com/
-// @version      1.0.0
+// @version      1.0.1
 // @author       Canonical's workplace engineering team
 // @description  Open written interviews in a new tab instead of downloading "File1.pdf" files.
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -15,11 +15,10 @@
 // @match        https://canonical.greenhouse.io/scorecards/**
 // ==/UserScript==
 
-const downloadLinks = [
-    ...document.querySelectorAll(
-        "a[data-download-url*='person_attachments/downloads']"
-    ),
-];
+const downloadLinks = Array.from(document.querySelectorAll(
+  "a[data-download-url*='person_attachments/downloads']"
+)).filter(el => el.textContent.endsWith(".pdf"));
+
 downloadLinks.forEach((linkEl) => {
     // remove existing React listeners
     const newLinkEl = linkEl.cloneNode(true);

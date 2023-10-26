@@ -4,6 +4,7 @@ import { JSDOM } from "jsdom";
 describe("Written interview in new tab test", () => {
     let domWindow;
     let testContainer;
+    let doNotDownloadContainer;
 
     beforeAll(() => {
         const dom = new JSDOM(
@@ -13,7 +14,10 @@ describe("Written interview in new tab test", () => {
             <head></head>
               <body>
                 <div id="test-container">
-                  <a class='test-doc' data-download-url="person_attachments/downloads" href="http://test.test"/>
+                  <a class='test-doc' data-download-url="person_attachments/downloads" href="http://test.test">file1.pdf</a>
+                </div>
+                <div id="do-not-download-container">
+                  <a class='test-doc' data-download-url="person_attachments/downloads" href="http://test.test">file1.docx</a>
                 </div>
                 <script>
                 ${require("fs").readFileSync(
@@ -31,6 +35,7 @@ describe("Written interview in new tab test", () => {
         );
 
         testContainer = dom.window.document.getElementById("test-container");
+        doNotDownloadContainer = dom.window.document.getElementById("do-not-download-container");
         domWindow = dom.window;
     });
 
@@ -47,7 +52,8 @@ describe("Written interview in new tab test", () => {
         domWindow.open = jest.fn();
         const testDoc = testContainer.querySelector(".test-doc");
         userEvent.click(testDoc);
-
-        expect(domWindow.fetch).toHaveBeenCalled();
+        const doNotDownloadDoc = doNotDownloadContainer.querySelector(".test-doc");
+        userEvent.click(doNotDownloadDoc);
+        expect(domWindow.fetch).toHaveBeenCalledTimes(1)
     });
 });
