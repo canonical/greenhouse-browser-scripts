@@ -9,6 +9,7 @@ Here is the list of the available Userscripts:
 -   [Greenhouse Application Review](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review.user.js): Add quick rejection buttons to the application review page, to perform rejection with one button click
 -   [Greenhouse written interviews in a new tab](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js): Open written interviews in a new tab instead of downloading "File1.pdf" files
 -   [Greenhouse Application Review Helper](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-helper.user.js): Adds additional icons to suggest the quality of the answer for custom application questions
+-   [Talent Interview Field Reminder](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/talent-interview-field-reminder.user.js): Create a reminder to update application custom fields after moving candidates to the Talent Interview stage
 
 ## Getting started
 
@@ -40,6 +41,7 @@ Once the browser extension is installed, for each script the you wish to install
 -   Greenhouse application review: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review.user.js
 -   Greenhouse written interviews in a new tab: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js
 -   Greenhouse Application Review Helper: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-helper.user.js
+-   Talent Interview Field Reminder: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/talent-interview-field-reminder.user.js
 
 ## Receiving updates
 
@@ -82,3 +84,9 @@ When this is enabled you will see this addition element in the toolbar:
 Open written interviews in a new tab instead of downloading "File1.pdf" files.
 
 Once the Userscript is installed, you may need to authorize popups for the first time.
+
+## Greenhouse talent interview field reminder
+
+Creates an alert when a candidate is moved into the Talent Interview stage.
+
+The alert will remind HLs to update the 'HL - Proposed level' and 'HL - Years of relevant experience' fields.
