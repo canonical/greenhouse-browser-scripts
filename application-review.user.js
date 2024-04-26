@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      1.1.0
+// @version      1.1.1
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -19,6 +19,7 @@
 
     const rejectBtnEl = document.querySelector("*[data-provides='reject']");
     const actionsBarEl = rejectBtnEl.parentNode;
+    let submitTimeout = 500;
 
     const keyDown = new KeyboardEvent("keydown", {
         bubbles: true,
@@ -70,7 +71,17 @@
                 option.dispatchEvent(mouseDown);
             }
         });
+        let templateInput;
+        let fromInput;
         let subjectInput;
+        const dropdownContainers = rejectModal.querySelectorAll(
+            '#reject-modal .sl-dropdown-container'
+        );
+        dropdownContainers.forEach((input) => {
+            if (input.previousElementSibling?.innerText === "From") {
+                fromInput = input;
+            }
+        });
         const inputs = rejectModal.querySelectorAll(
             '#reject-modal input[type="text"]'
         );
@@ -82,14 +93,15 @@
         const rejectChecker = setInterval(() => {
             if (subjectInput.value !== "") {
                 clearInterval(rejectChecker);
+                setFromToNoReply(fromInput)
                 rejectButton.click();
                 setEnabled();
                 setTimeout(
                     () => rejectModal.classList.remove("hide-modal"),
-                    500
+                    1000
                 );
             }
-        }, 500);
+        }, 1000);
     }
 
     // State utilities
@@ -124,6 +136,21 @@
     }
 
     // Common functions
+    function setFromToNoReply(fromInput) {
+        if (!fromInput.innerText.startsWith("no-reply")) {
+            fromInput.querySelector('.sl-dropdown__control').dispatchEvent(mouseDown);
+            const replyOption = fromInput.querySelectorAll(
+                ".sl-dropdown__option"
+            );
+
+            replyOption.forEach(function (option) {
+                if (option.innerText.startsWith("no-reply")) {
+                    option.click();
+                    option.dispatchEvent(mouseDown);
+                }
+            });
+        }
+    }
 
     function addUI(container) {
         container.insertAdjacentHTML(
