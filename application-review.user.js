@@ -19,7 +19,6 @@
 
     const rejectBtnEl = document.querySelector("*[data-provides='reject']");
     const actionsBarEl = rejectBtnEl.parentNode;
-    let submitTimeout = 500;
 
     const keyDown = new KeyboardEvent("keydown", {
         bubbles: true,
@@ -98,10 +97,10 @@
                 setEnabled();
                 setTimeout(
                     () => rejectModal.classList.remove("hide-modal"),
-                    1000
+                    500
                 );
             }
-        }, 1000);
+        }, 500);
     }
 
     // State utilities
