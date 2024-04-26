@@ -70,7 +70,6 @@
                 option.dispatchEvent(mouseDown);
             }
         });
-        let templateInput;
         let fromInput;
         let subjectInput;
         const dropdownContainers = rejectModal.querySelectorAll(
