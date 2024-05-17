@@ -10,6 +10,7 @@ Here is the list of the available Userscripts:
 -   [Greenhouse written interviews in a new tab](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js): Open written interviews in a new tab instead of downloading "File1.pdf" files
 -   [Greenhouse Application Review Helper](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-helper.user.js): Adds additional icons to suggest the quality of the answer for custom application questions
 -   [Talent Interview Field Reminder](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/talent-interview-field-reminder.user.js): Create a reminder to update application custom fields after moving candidates to the Talent Interview stage
+-   [To-do expander](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/todo-expander.user.js): Provides a "Reveal all" button to the bulk action set to expand the todo per candidate row
 
 ## Getting started
 
@@ -90,3 +91,8 @@ Once the Userscript is installed, you may need to authorize popups for the first
 Creates an alert when a candidate is moved into the Talent Interview stage.
 
 The alert will remind HLs to update the 'HL - Proposed level' and 'HL - Years of relevant experience' fields.
+
+## Greenhouse to-do expander
+
+Adds a button to the bulk actions section of that Greenhouse candidate list. This button reveals all todo sections on each candidate displayed on the list.
+![Greenhouse todo reveal all button](/resources/todo-expander.png)
