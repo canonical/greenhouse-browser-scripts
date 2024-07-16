@@ -45,6 +45,7 @@
         setLoading();
         rejectBtnEl.click();
 
+        // check for reject modal before continuing
         const rejectModalChecker = setInterval(() => {
             const rejectModal = document.querySelector("#reject-modal");
             if (rejectModal) {
@@ -67,6 +68,7 @@
                 }
                 reasonSelector.dispatchEvent(keyDown);
 
+                // check for dropdown menu before continuing
                 const dropdownMenuChecker = setInterval(() => {
                     const dropdownMenu = rejectModal.querySelector(
                         ".Select-menu-outer"
