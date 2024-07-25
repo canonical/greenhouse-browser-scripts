@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      1.1.2
+// @version      1.1.3
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -70,9 +70,8 @@
 
                 // check for dropdown menu before continuing
                 const dropdownMenuChecker = setInterval(() => {
-                    const dropdownMenu = rejectModal.querySelector(
-                        ".Select-menu-outer"
-                    );
+                    const dropdownMenu =
+                        rejectModal.querySelector(".Select-menu-outer");
                     if (dropdownMenu) {
                         clearInterval(dropdownMenuChecker);
                         const reasonOptions = rejectModal.querySelectorAll(
@@ -89,10 +88,13 @@
                 let fromInput;
                 let subjectInput;
                 const dropdownContainers = rejectModal.querySelectorAll(
-                    '#reject-modal .sl-dropdown-container'
+                    "#reject-modal .sl-dropdown-container"
                 );
                 dropdownContainers.forEach((input) => {
-                    if (input.previousElementSibling?.innerText === "From") {
+                    if (
+                        input.parentElement.parentElement.querySelector("label")
+                            ?.innerText === "From"
+                    ) {
                         fromInput = input;
                     }
                 });
@@ -154,7 +156,9 @@
     // Common functions
     function setFromToNoReply(fromInput) {
         if (!fromInput.innerText.startsWith("no-reply")) {
-            fromInput.querySelector('.sl-dropdown__control').dispatchEvent(mouseDown);
+            fromInput
+                .querySelector(".sl-dropdown__control")
+                .dispatchEvent(mouseDown);
             const replyOption = fromInput.querySelectorAll(
                 ".sl-dropdown__option"
             );
