@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review Helper
 // @namespace    https://canonical.com/
-// @version      0.1.14
+// @version      0.1.15
 // @description  Add's hints to application custom question answers
 // @author       Anthony Dillon
 // @icon         https://icons.duckduckgo.com/ip3/greenhouse.io.ico
@@ -68,11 +68,13 @@
                 clearClass(question);
                 if (questionText.startsWith("Describe")) {
                     question.classList.add(textReview(answer));
-                } else if (questionText.startsWith("What was your bachelor's university degree result")) {
-                    question.classList.add(degreeReview(answer)); 
+                } else if (questionText.includes("degree result")) {
+                    question.classList.add(degreeReview(answer));
                 } else {
                     switch (true) {
-                        case /Are you due to graduate soon, or have you graduated from university in the past two years\?/.test(questionText):
+                        case /Are you due to graduate soon, or have you graduated from university in the past two years\?/.test(
+                            questionText
+                        ):
                             question.classList.add("elephant");
                             break;
                         case /What time zone are you in\?/.test(questionText):
@@ -81,25 +83,34 @@
                         case /What is your degree result\?/.test(questionText):
                             question.classList.add(degreeReview(answer));
                             break;
-                        case /What was your Bachelors university degree result*/.test(questionText):
+                        case /What was your bachelor's university degree result*/.test(
+                            questionText
+                        ):
                             question.classList.add(degreeReview(answer));
                             break;
-                        case /What was your bachelor's university degree result*/.test(questionText):
-                            question.classList.add(degreeReview(answer));
-                            break;
-                        case /How did you do in maths, physics or computer science at high school\?/.test(questionText):
+                        case /How did you do in maths, physics or computer science at high school\?/.test(
+                            questionText
+                        ):
                             question.classList.add(doReview(answer));
                             break;
-                        case /How did you perform in mathematics at high school\?/.test(questionText):
+                        case /How did you perform in mathematics at high school\?/.test(
+                            questionText
+                        ):
                             question.classList.add(doReview(answer));
                             break;
-                        case /How did you do in your native language at high school\?/.test(questionText):
+                        case /How did you do in your native language at high school\?/.test(
+                            questionText
+                        ):
                             question.classList.add(doReview(answer));
                             break;
-                        case /How did you perform in your native language at high school\?/.test(questionText):
+                        case /How did you perform in your native language at high school\?/.test(
+                            questionText
+                        ):
                             question.classList.add(doReview(answer));
                             break;
-                        case /We expect all colleagues to meet in person twice a year.* Are you willing and able to commit to this\?/.test(questionText):
+                        case /We expect all colleagues to meet in person twice a year.* Are you willing and able to commit to this\?/.test(
+                            questionText
+                        ):
                             question.classList.add(yesReview(answer));
                             break;
                         default:
@@ -138,8 +149,8 @@
             return "pecise";
         }
         if (answer.includes("GPA")) {
-            var removeColon = answer.replace(":", "");
-            var splitBySpace = removeColon.split(" ");
+            var cleanUp = answer.replace(":", "");
+            var splitBySpace = cleanUp.split(" ");
             var index = splitBySpace.indexOf("GPA");
             var score = splitBySpace[index + 1];
             var GPACheckResult = GPACheck(score);
@@ -230,13 +241,19 @@
     }
 
     function doReview(answer) {
-        if (answer === "Top student" || answer === "Top student at school" || answer === "Top 1% in the region" || answer === "Top 0.1% in the region") {
+        if (
+            answer === "Top student" ||
+            answer === "Top student at school" ||
+            answer === "Top 1% in the region" ||
+            answer === "Top 0.1% in the region" ||
+            answer === "Top 0.01% in the region"
+        ) {
             return "pebble";
         }
-        if (answer === "Top 5%" || answer === "Top 10%") {
+        if (answer === "Top 5% at school" || answer === "Top 10% at school") {
             return "ninja";
         }
-        if (answer === "Top 20%" || answer === "Top 50%") {
+        if (answer === "Top 20% at school" || answer === "Top 50% at school") {
             return "mamba";
         }
         if (answer === "Cannot recall" || answer === "Not a strength") {
@@ -261,9 +278,11 @@
         element.classList.remove("pebble");
     }
 
-    reviewContainer.addEventListener("DOMSubtreeModified", function () {
+    const config = { attributes: false, childList: true, subtree: true };
+    const observer = new MutationObserver(function () {
         setTimeout(run, 0);
     });
+    observer.observe(reviewContainer, config);
 
     run();
 })();
