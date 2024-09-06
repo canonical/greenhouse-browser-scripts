@@ -261,9 +261,25 @@
         element.classList.remove("pebble");
     }
 
-    reviewContainer.addEventListener("DOMSubtreeModified", function () {
-        setTimeout(run, 0);
-    });
-
+    // initial run to handle questions visible on page load
     run();
+
+    // function to find and attach event listener to the "See all" link
+    function attachSeeAllListener() {
+        const seeAllLink = document.querySelector('a.link__Link-fCFvqa[href="#"]');
+        if (seeAllLink) {
+            seeAllLink.addEventListener("click", () => {
+                // wait a short time for the DOM to update before running
+                setTimeout(run, 500);
+            });
+        }
+    }
+
+    // check for "See all" link periodically
+    const checkForSeeAllLink = setInterval(() => {
+        if (document.querySelector('a.link__Link-fCFvqa[href="#"]')) {
+            attachSeeAllListener();
+            clearInterval(checkForSeeAllLink);
+        }
+    }, 1000);
 })();
