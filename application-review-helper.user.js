@@ -284,25 +284,42 @@
         element.classList.remove("pebble");
     }
 
+    // debounce function to limit how often run() is called
+    let debounceTimer;
+    function debounceRun() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(run, 300);
+    }
+
     // initial run to handle questions visible on page load
     run();
 
-    // function to find and attach event listener to the "See all" link
-    function attachSeeAllListener() {
-        const seeAllLink = document.querySelector('a.link__Link-fCFvqa[href="#"]');
-        if (seeAllLink) {
-            seeAllLink.addEventListener("click", () => {
-                // wait a short time for the DOM to update before running
-                setTimeout(run, 500);
-            });
+    // mutation observer to watch for changes in the review container
+    const observer = new MutationObserver((mutations) => {
+        let shouldRun = false;
+        for (let mutation of mutations) {
+            if (mutation.type === 'childList' || mutation.type === 'subtree') {
+                shouldRun = true;
+                break;
+            }
+        }
+        if (shouldRun) {
+            debounceRun();
+        }
+    });
+
+    // function to start observing the review container
+    function startObserver() {
+        const reviewContainer = document.querySelector('div[data-provides="app-review"]');
+        if (reviewContainer) {
+            // start mutation observer
+            observer.observe(reviewContainer, { childList: true, subtree: true });
+        } else {
+            // review container not found, try again in 1 second
+            setTimeout(startObserver, 1000);
         }
     }
 
-    // check for "See all" link periodically
-    const checkForSeeAllLink = setInterval(() => {
-        if (document.querySelector('a.link__Link-fCFvqa[href="#"]')) {
-            attachSeeAllListener();
-            clearInterval(checkForSeeAllLink);
-        }
-    }, 1000);
+    // start the observer
+    startObserver();
 })();
