@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review Helper
 // @namespace    https://canonical.com/
-// @version      0.1.14
+// @version      0.1.15
 // @description  Add's hints to application custom question answers
 // @author       Anthony Dillon
 // @icon         https://icons.duckduckgo.com/ip3/greenhouse.io.ico
@@ -101,6 +101,15 @@
                             break;
                         case /We expect all colleagues to meet in person twice a year.* Are you willing and able to commit to this\?/.test(questionText):
                             question.classList.add(yesReview(answer));
+                            break;
+                        case /We expect all colleagues to meet in person 2-4 times a year, at internal company events/.test(questionText):
+                            question.classList.add(yesReview(answer));
+                            break;
+                        case /During this application process I agree to use only my own words/.test(questionText):
+                            question.classList.add(yesReview(answer));
+                            break;
+                        case /Please confirm that you have read and agree to Canonical's Recruitment Privacy Notice and Privacy Policy/.test(questionText):
+                            question.classList.add(acknowledgeReview(answer));
                             break;
                         default:
                             question.classList.add("elephant");
@@ -230,13 +239,19 @@
     }
 
     function doReview(answer) {
-        if (answer === "Top student" || answer === "Top student at school" || answer === "Top 1% in the region" || answer === "Top 0.1% in the region") {
+        if (
+            answer === "Top student" || 
+            answer === "Top student at school" || 
+            answer === "Top 1% in the region" || 
+            answer === "Top 0.1% in the region" || 
+            answer === "Top 0.01% in the region"
+        ) {
             return "pebble";
         }
-        if (answer === "Top 5%" || answer === "Top 10%") {
+        if (answer === "Top 5% at school" || answer === "Top 10% at school") {
             return "ninja";
         }
-        if (answer === "Top 20%" || answer === "Top 50%") {
+        if (answer === "Top 20% at school" || answer === "Top 50% at school") {
             return "mamba";
         }
         if (answer === "Cannot recall" || answer === "Not a strength") {
@@ -253,6 +268,14 @@
         }
     }
 
+    function acknowledgeReview(answer) {
+        if (answer === "Acknowledge/Confirm") {
+            return "ninja";
+        } else {
+            return "pecise";
+        }
+    }
+
     function clearClass(element) {
         element.classList.remove("pecise");
         element.classList.remove("mamba");
@@ -261,9 +284,42 @@
         element.classList.remove("pebble");
     }
 
-    reviewContainer.addEventListener("DOMSubtreeModified", function () {
-        setTimeout(run, 0);
+    // debounce function to limit how often run() is called
+    let debounceTimer;
+    function debounceRun() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(run, 300);
+    }
+
+    // initial run to handle questions visible on page load
+    run();
+
+    // mutation observer to watch for changes in the review container
+    const observer = new MutationObserver((mutations) => {
+        let shouldRun = false;
+        for (let mutation of mutations) {
+            if (mutation.type === 'childList' || mutation.type === 'subtree') {
+                shouldRun = true;
+                break;
+            }
+        }
+        if (shouldRun) {
+            debounceRun();
+        }
     });
 
-    run();
+    // function to start observing the review container
+    function startObserver() {
+        const reviewContainer = document.querySelector('div[data-provides="app-review"]');
+        if (reviewContainer) {
+            // start mutation observer
+            observer.observe(reviewContainer, { childList: true, subtree: true });
+        } else {
+            // review container not found, try again in 1 second
+            setTimeout(startObserver, 1000);
+        }
+    }
+
+    // start the observer
+    startObserver();
 })();

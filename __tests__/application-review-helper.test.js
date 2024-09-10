@@ -231,11 +231,32 @@ describe("Application review helper tests", () => {
 
     it(`adds class name based on answer to question - ${highSchoolQuestion}`, async () => {
         const answerOne = "Top student";
-        const answerTwo = "Top 10%";
-        const answerThree = "Top 50%";
-        const answerFour = "Cannot recall";
+        const answerTwo = "Top student at school";
+        const answerThree = "Top 1% in the region";
+        const answerFour = "Top 0.1% in the region";
+        const answerFive = "Top 0.01% in the region";
+        const answerSix = "Top 5% at school";
+        const answerSeven = "Top 10% at school";
+        const answerEight = "Top 20% at school";
+        const answerNine = "Top 50% at school";
+        const answerTen = "Cannot recall";
+        const answerEleven = "Not a strength";
+        const answerTwelve = "Not an answer that we check for";
 
-        const answerArray = [answerOne, answerTwo, answerThree, answerFour];
+        const answerArray = [
+            answerOne,
+            answerTwo,
+            answerThree,
+            answerFour,
+            answerFive,
+            answerSix,
+            answerSeven,
+            answerEight,
+            answerNine,
+            answerTen,
+            answerEleven,
+            answerTwelve,
+        ];
 
         for (let i = 0; i < answerArray.length; i++) {
             const addedClassName = await getClassNameFromAnswer(
@@ -248,13 +269,37 @@ describe("Application review helper tests", () => {
                     expect(addedClassName).toBe(classNamePebble);
                     break;
                 case answerTwo:
-                    expect(addedClassName).toBe(classNameNinja);
+                    expect(addedClassName).toBe(classNamePebble);
                     break;
                 case answerThree:
-                    expect(addedClassName).toBe(classNameMamba);
+                    expect(addedClassName).toBe(classNamePebble);
                     break;
                 case answerFour:
+                    expect(addedClassName).toBe(classNamePebble);
+                    break;
+                case answerFive:
+                    expect(addedClassName).toBe(classNamePebble);
+                    break;
+                case answerSix:
+                    expect(addedClassName).toBe(classNameNinja);
+                    break;
+                case answerSeven:
+                    expect(addedClassName).toBe(classNameNinja);
+                    break;
+                case answerEight:
+                    expect(addedClassName).toBe(classNameMamba);
+                    break;
+                case answerNine:
+                    expect(addedClassName).toBe(classNameMamba);
+                    break;
+                case answerTen:
                     expect(addedClassName).toBe(classNamePecise);
+                    break;
+                case answerEleven:
+                    expect(addedClassName).toBe(classNamePecise);
+                    break;
+                case answerTwelve:
+                    expect(addedClassName).toBe(classNameElephant);
                     break;
                 default:
                     expect(addedClassName).toBe(classNameElephant);
@@ -265,11 +310,32 @@ describe("Application review helper tests", () => {
 
     it(`adds class name based on answer to question - ${languageQuestion}`, async () => {
         const answerOne = "Top student";
-        const answerTwo = "Top 10%";
-        const answerThree = "Top 50%";
-        const answerFour = "Cannot recall";
+        const answerTwo = "Top student at school";
+        const answerThree = "Top 1% in the region";
+        const answerFour = "Top 0.1% in the region";
+        const answerFive = "Top 0.01% in the region";
+        const answerSix = "Top 5% at school";
+        const answerSeven = "Top 10% at school";
+        const answerEight = "Top 20% at school";
+        const answerNine = "Top 50% at school";
+        const answerTen = "Cannot recall";
+        const answerEleven = "Not a strength";
+        const answerTwelve = "Not an answer that we check for";
 
-        const answerArray = [answerOne, answerTwo, answerThree, answerFour];
+        const answerArray = [
+            answerOne,
+            answerTwo,
+            answerThree,
+            answerFour,
+            answerFive,
+            answerSix,
+            answerSeven,
+            answerEight,
+            answerNine,
+            answerTen,
+            answerEleven,
+            answerTwelve,
+        ];
 
         for (let i = 0; i < answerArray.length; i++) {
             const addedClassName = await getClassNameFromAnswer(
@@ -282,13 +348,37 @@ describe("Application review helper tests", () => {
                     expect(addedClassName).toBe(classNamePebble);
                     break;
                 case answerTwo:
-                    expect(addedClassName).toBe(classNameNinja);
+                    expect(addedClassName).toBe(classNamePebble);
                     break;
                 case answerThree:
-                    expect(addedClassName).toBe(classNameMamba);
+                    expect(addedClassName).toBe(classNamePebble);
                     break;
                 case answerFour:
+                    expect(addedClassName).toBe(classNamePebble);
+                    break;
+                case answerFive:
+                    expect(addedClassName).toBe(classNamePebble);
+                    break;
+                case answerSix:
+                    expect(addedClassName).toBe(classNameNinja);
+                    break;
+                case answerSeven:
+                    expect(addedClassName).toBe(classNameNinja);
+                    break;
+                case answerEight:
+                    expect(addedClassName).toBe(classNameMamba);
+                    break;
+                case answerNine:
+                    expect(addedClassName).toBe(classNameMamba);
+                    break;
+                case answerTen:
                     expect(addedClassName).toBe(classNamePecise);
+                    break;
+                case answerEleven:
+                    expect(addedClassName).toBe(classNamePecise);
+                    break;
+                case answerTwelve:
+                    expect(addedClassName).toBe(classNameElephant);
                     break;
                 default:
                     expect(addedClassName).toBe(classNameElephant);
