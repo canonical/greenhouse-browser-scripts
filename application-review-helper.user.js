@@ -68,7 +68,7 @@
                 clearClass(question);
                 if (questionText.startsWith("Describe")) {
                     question.classList.add(textReview(answer));
-                } else if (questionText.startsWith("What was your bachelor's university degree result")) {
+                } else if (questionText.includes("degree result")) {
                     question.classList.add(degreeReview(answer)); 
                 } else {
                     switch (true) {
@@ -147,8 +147,8 @@
             return "pecise";
         }
         if (answer.includes("GPA")) {
-            var removeColon = answer.replace(":", "");
-            var splitBySpace = removeColon.split(" ");
+            var cleanUp = answer.replace(":", "");
+            var splitBySpace = cleanUp.split(" ");
             var index = splitBySpace.indexOf("GPA");
             var score = splitBySpace[index + 1];
             var GPACheckResult = GPACheck(score);
@@ -284,42 +284,12 @@
         element.classList.remove("pebble");
     }
 
-    // debounce function to limit how often run() is called
-    let debounceTimer;
-    function debounceRun() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(run, 300);
-    }
-
-    // initial run to handle questions visible on page load
-    run();
-
     // mutation observer to watch for changes in the review container
-    const observer = new MutationObserver((mutations) => {
-        let shouldRun = false;
-        for (let mutation of mutations) {
-            if (mutation.type === 'childList' || mutation.type === 'subtree') {
-                shouldRun = true;
-                break;
-            }
-        }
-        if (shouldRun) {
-            debounceRun();
-        }
+    const config = { attributes: false, childList: true, subtree: true };
+    const observer = new MutationObserver(function () {
+        setTimeout(run, 0);
     });
+    observer.observe(reviewContainer, config);
 
-    // function to start observing the review container
-    function startObserver() {
-        const reviewContainer = document.querySelector('div[data-provides="app-review"]');
-        if (reviewContainer) {
-            // start mutation observer
-            observer.observe(reviewContainer, { childList: true, subtree: true });
-        } else {
-            // review container not found, try again in 1 second
-            setTimeout(startObserver, 1000);
-        }
-    }
-
-    // start the observer
-    startObserver();
+    run();
 })();
