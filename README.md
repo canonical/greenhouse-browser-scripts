@@ -9,6 +9,7 @@ Here is the list of the available Userscripts:
 -   [Greenhouse Application Review](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review.user.js): Add quick rejection buttons to the application review page, to perform rejection with one button click
 -   [Greenhouse written interviews in a new tab](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js): Open written interviews in a new tab instead of downloading "File1.pdf" files
 -   [Greenhouse Application Review Helper](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-helper.user.js): Adds additional icons to suggest the quality of the answer for custom application questions
+-   [Greenhouse Duplicate Check Helper](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/duplicate-check.user.js): If a candidate duplicate tag is detected, the script colors the entire header, so that it is harder to overlook. Also, it opens the duplicate candidate in a new tab so that you can start checking quicker.
 -   [Talent Interview Field Reminder](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/talent-interview-field-reminder.user.js): Create a reminder to update application custom fields after moving candidates to the Talent Interview stage
 -   [To-do expander](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/todo-expander.user.js): Provides a "Reveal all" button to the bulk action set to expand the todo per candidate row
 
@@ -42,6 +43,7 @@ Once the browser extension is installed, for each script the you wish to install
 -   Greenhouse application review: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review.user.js
 -   Greenhouse written interviews in a new tab: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js
 -   Greenhouse Application Review Helper: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-helper.user.js
+-   Greenhouse Duplicate Check Helper: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/duplicate-check.user.js
 -   Talent Interview Field Reminder: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/talent-interview-field-reminder.user.js
 
 ## Receiving updates
