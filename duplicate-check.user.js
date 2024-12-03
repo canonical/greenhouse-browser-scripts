@@ -15,55 +15,36 @@
 // @grant        GM_openInTab
 // ==/UserScript==
 
+/**
+ * This script checks the page on page load and on candidate change for the duplicate tag.
+ * If found it paints the entire header in duplicate tag color and opens the candidate profile
+ * in a new tab for more convenient duplicate checking.
+ */
+
 (function () {
     "use strict";
 
-    // do all operations in this container
+    // all further operations are done in this element
     const reviewContainer = document.querySelector(
         'div[data-provides="app-review"]'
     );
-    const header = reviewContainer.querySelector(
-        'header'
-    );
-    const candidateLink = header.querySelector(
-        'a[target="_blank"][href*="people"]'
-    );
-
-    function logMutations(mutationList) {
-        /* convenience helper to log all possible mutations for a mutation list.
-         * Takes a MutationObserver.mutationList and tries to log what changed
-         * on the observed item
-         */
-        mutationList.forEach(mutation => {
-            if (mutation.type === "childList") {
-                console.log("A child node has been added or removed.");
-                console.log(mutation)
-            } else if (mutation.type === "characterData") {
-                console.log("Character data change detected.");
-                console.log(mutation)
-            } else if (mutation.type === "subtree") {
-                console.log("Subtree change detected.");
-                console.log(mutation)
-            } else if (mutation.type === "attributes") {
-                console.log(`The ${mutation.attributeName} attribute was modified.`);
-            }
-        });
-    }
+    const header = reviewContainer.querySelector("header");
 
     function checkDuplicateAndOpenInTab() {
         /* do the actual checking and logging */
-        if (reviewContainer && candidateLink) {
-
-            let duplicateTag = reviewContainer.querySelector('span[title="Potential duplicate"]');
+        if (reviewContainer) {
+            let duplicateTag = reviewContainer.querySelector(
+                'span[title="Potential duplicate"]'
+            );
 
             if (duplicateTag) {
+                // we could get the link from the mutation but this also works for first load
+                let updatedLink = header.querySelector(
+                    'a[target="_blank"][href*="people"]'
+                );
                 // match greenhouse tag color
-                header.style.backgroundColor = '#f7c8b0';
-
-                setTimeout(() => {
-                    GM_openInTab(candidateLink.href);
-                    //alert('in timeout and if duplicate tag: ' + candidateLink.href);
-                }, 250);
+                header.style.backgroundColor = "#f7c8b0";
+                GM_openInTab(updatedLink.href);
             } else {
                 header.style.backgroundColor = null;
             }
@@ -74,23 +55,32 @@
     checkDuplicateAndOpenInTab();
 
     // for page load (Do not use DOMSubtreeModified event as its obsolete and about to be deprecated)
-    const observer = new MutationObserver(mutationList => {
-        console.log('mutation observer triggered')
-        // logMutations(mutationList);
-        mutationList.forEach(mutation => {
-            console.log(mutation)
-            if (mutation.type === "childList" &&
-                mutation.addedNodes.length > 0 &&
-                mutation.removedNodes.length === 0)
-            {
-                console.log('found the mutation that adds the nodes')
-                // trigger the check only if a node was added (avoids duplicate tab opening)
-                checkDuplicateAndOpenInTab();
+    const observer = new MutationObserver((mutationList) => {
+        mutationList.forEach((mutation) => {
+            if (mutation.type === "childList") {
+                let foundLink = false;
+                mutation.addedNodes.forEach((node) => {
+                    if (node.innerHTML?.includes('href="/people/')) {
+                        foundLink = true;
+                    }
+                });
+                if (foundLink) {
+                    setTimeout(function () {
+                        // need to wait a bit until the new profile has been rendered
+                        checkDuplicateAndOpenInTab();
+                    }, 250);
+                }
             }
         });
     });
 
     // watch the state of a particular element for updating instead of the whole container
-    observer.observe(header, { attributes: false, characterData: false, childList: true, subtree: true }); // availale props: attributes, characterData, childList, subtree
-
+    //   for some reason the observer is not triggered correctly every time if we watch for childList changes only
+    //   watching for everything is less flaky but requires checking more mutations
+    observer.observe(header, {
+        attributes: true,
+        characterData: true,
+        childList: true,
+        subtree: true,
+    }); // available props: attributes, characterData, childList, subtree
 })();
