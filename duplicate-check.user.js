@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Open Candidate Profile in new Tab if Duplicate Batch is detected
+// @name         Open Candidate Profile in new Tab if Duplicate Badge is detected
 // @namespace    https://canonical.com/
 // @version      2024-11-25
 // @author       Thorsten Merten <thorsten.merten@canonical.com>
