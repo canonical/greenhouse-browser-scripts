@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Open Candidate Profile in new Tab if Duplicate Badge is detected
 // @namespace    https://canonical.com/
-// @version      0.1.0
+// @version      0.2.0
 // @author       Thorsten Merten <thorsten.merten@canonical.com>
 // @description  This script will color the entire header and open a new tab automatically if the candiate duplicate tag is detected. Saves time and reminds you to get merging.
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
