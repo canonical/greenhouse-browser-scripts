@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Open Candidate Profile in new Tab if Duplicate Badge is detected
 // @namespace    https://canonical.com/
-// @version      0.1.0
+// @version      0.2.0
 // @author       Thorsten Merten <thorsten.merten@canonical.com>
 // @description  This script will color the entire header and open a new tab automatically if the candiate duplicate tag is detected. Saves time and reminds you to get merging.
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -12,13 +12,15 @@
 // @updateURL    https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/duplicate-check.user.js
 // @downloadURL  https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/duplicate-check.user.js
 // @supportURL   https://github.com/canonical/greenhouse-browser-scripts/issues
+// @connect      https://canonical.greenhouse.io
+// @grant        GM_xmlhttpRequest
 // @grant        GM_openInTab
 // ==/UserScript==
 
 /**
  * This script checks the page on page load and on candidate change for the duplicate tag.
- * If found it paints the entire header in duplicate tag color and opens the candidate profile
- * in a new tab for more convenient duplicate checking.
+ * If found it paints the entire header in duplicate tag color and
+ * opens both candidate profiles in new tabs for more convenient duplicate checking.
  */
 
 (function () {
@@ -45,6 +47,27 @@
                 // match greenhouse tag color
                 header.style.backgroundColor = "#f7c8b0";
                 GM_openInTab(updatedLink.href);
+
+                /*
+                grab merge page url.
+                format: https://canonical.greenhouse.io/people/{candidateId}/merge?application_id={applicationId}
+                the new candidate page redesign alters how the url works, from "?application_id=" to "applications/"
+                */
+                let mergeUrl = (updatedLink.href.includes("?application_id="))?
+                                updatedLink.href.replace("?application_id=", "/merge?application_id=") :
+                                updatedLink.href.replace("applications/", "/merge?application_id=")
+
+                // fetch merge page and open the duplicate profile in a new tab
+                GM_xmlhttpRequest({
+                    method: "GET",
+                    url: mergeUrl,
+                    onload: function(response) {
+                        let duplicateUrl = response.responseXML.getElementById("primary_merge_candidate").querySelector(
+                            'a[target="_blank"][href*="people"]'
+                        );
+                        GM_openInTab(duplicateUrl.href);
+                    }
+                });
             } else {
                 header.style.backgroundColor = null;
             }
