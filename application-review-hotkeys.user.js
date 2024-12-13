@@ -61,10 +61,10 @@
             return
         }
 
-        if (event.key === 'a') {
+        if (event.key.toLowerCase() === 'a') {
             advanceButton.click()
         }
-        else if (event.key === 'r') {
+        else if (event.key.toLowerCase() === 'r') {
             rejectButton.click()
         }
         else {
