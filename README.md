@@ -7,6 +7,7 @@ This project contains a set of handful [Userscripts](https://en.wikipedia.org/wi
 Here is the list of the available Userscripts:
 
 -   [Greenhouse Application Review](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review.user.js): Add quick rejection buttons to the application review page, to perform rejection with one button click
+-   [Greenhouse Application Hotkeys](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-hotkeys.user.js): Add badges and hotkeys to the quick rejection buttons provided by the Greenhouse Applicateion Review script
 -   [Greenhouse written interviews in a new tab](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js): Open written interviews in a new tab instead of downloading "File1.pdf" files
 -   [Greenhouse Application Review Helper](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-helper.user.js): Adds additional icons to suggest the quality of the answer for custom application questions
 -   [Greenhouse Duplicate Check Helper](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/duplicate-check.user.js): If a candidate duplicate tag is detected, the script colors the entire header, so that it is harder to overlook. Also, it opens the duplicate candidate in a new tab so that you can start checking quicker.
@@ -41,6 +42,7 @@ Once the browser extension is installed, for each script the you wish to install
 ### Userscript installation links
 
 -   Greenhouse application review: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review.user.js
+-   Greenhouse application review hotkeys: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-hotkeys.user.js
 -   Greenhouse written interviews in a new tab: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/written-interview-in-new-tab.user.js
 -   Greenhouse Application Review Helper: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-helper.user.js
 -   Greenhouse Duplicate Check Helper: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/duplicate-check.user.js
@@ -81,6 +83,11 @@ Here is the list of rejection actions:
 
 When this is enabled you will see this addition element in the toolbar:
 ![Greenhouse application rejection buttons](/resources/greenhouse-application-rejection.png)
+
+## Greenhouse application review hotkeys
+
+When this script is enabled you will see the same buttons as the Greenhouse Application Review script, but they will also be overlayed with badges indicating various hotkeys you can use to trigger the various rejection buttons. You will see the following badges on the buttons:
+![Greenhouse application review hotkeys](/resources/application-review-hotkeys.png)
 
 ## Greenhouse written interviews in new tab
 
