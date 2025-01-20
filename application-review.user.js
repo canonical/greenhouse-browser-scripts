@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Application Review
 // @namespace    https://canonical.com/
-// @version      1.1.3
+// @version      1.1.4
 // @author       Canonical's workplace engineering team
 // @description  Add shortcut buttons to application review page
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -51,75 +51,105 @@
             if (rejectModal) {
                 clearInterval(rejectModalChecker);
                 rejectModal.classList.add("hide-modal");
-                const sendEmailInput = rejectModal.querySelector("#send-email");
-                if (!sendEmailInput.checked) {
-                    sendEmailInput.click();
-                }
-                const rejectButton = rejectModal.querySelector(
-                    'a[title="Reject this candidate"]'
-                );
-                let reasonSelector = rejectModal.querySelector(
-                    "[data-provides='reject-reason-dropdown'] .Select-value-label"
-                );
-                if (!reasonSelector) {
-                    reasonSelector = rejectModal.querySelector(
-                        "[data-provides='reject-reason-dropdown'] .Select-placeholder"
+                
+                // wait for reject modal to be hidden before continuing
+                setTimeout(() => {
+                    // open reason selector dropdown
+                    let reasonSelector = rejectModal.querySelector(
+                        "[data-provides='reject-reason-dropdown'] .Select-value-label"
                     );
-                }
-                reasonSelector.dispatchEvent(keyDown);
-
-                // check for dropdown menu before continuing
-                const dropdownMenuChecker = setInterval(() => {
-                    const dropdownMenu =
-                        rejectModal.querySelector(".Select-menu-outer");
-                    if (dropdownMenu) {
-                        clearInterval(dropdownMenuChecker);
-                        const reasonOptions = rejectModal.querySelectorAll(
-                            ".Select-menu-outer .Select-option"
+                    if (!reasonSelector) {
+                        reasonSelector = rejectModal.querySelector(
+                            "[data-provides='reject-reason-dropdown'] .Select-placeholder"
                         );
-                        reasonOptions.forEach(function (option) {
-                            if (option.getAttribute("aria-label") === reason) {
-                                option.dispatchEvent(mouseDown);
+                    }
+                    reasonSelector.dispatchEvent(keyDown);
+
+                    // interval to check for dropdown menu
+                    const dropdownMenuChecker = setInterval(() => {
+                        const dropdownMenu =
+                            rejectModal.querySelector(".Select-menu-outer");
+                        if (dropdownMenu) {
+                            clearInterval(dropdownMenuChecker);
+                            const reasonOptions = rejectModal.querySelectorAll(
+                                ".Select-menu-outer .Select-option"
+                            );
+                            reasonOptions.forEach(function (option) {
+                                if (option.getAttribute("aria-label") === reason) {
+                                    option.dispatchEvent(mouseDown);
+                                }
+                            });
+
+                            // check for email input and reject button, strictly after reason is selected
+                            const sendEmailInput = rejectModal.querySelector("#send-email");
+                            const rejectButton = rejectModal.querySelector('a[title="Reject this candidate"]');
+                            
+                            if (!sendEmailInput) {
+                                // no email input found. candidate is not emailable for whatever reason,
+                                // so we ask HL what they would like to do and handle the case of
+                                // non-emailable candidate separately
+                                const warning = (
+                                    "Unable to send rejection email. " +
+                                    "Candidate may be marked as \"Do Not Email\"."
+                                );
+                                console.warn(warning);
+                                const shouldStillReject = confirm(
+                                    warning + 
+                                    "\n\nIf you would like to reject anyways, click OK. " +
+                                    "Otherwise, click Cancel."
+                                );
+                                if (!shouldStillReject) {
+                                    setEnabled();
+                                    return;
+                                }
+                                
+                                // handle non-emailable candidate rejection
+                                rejectButton.click();
+                                setEnabled();
+                                setTimeout(() => rejectModal.classList.remove("hide-modal"), 500);
+                                return;
                             }
-                        });
-                    }
-                }, 100);
 
-                let fromInput;
-                let subjectInput;
-                const dropdownContainers = rejectModal.querySelectorAll(
-                    "#reject-modal .sl-dropdown-container"
-                );
-                dropdownContainers.forEach((input) => {
-                    if (
-                        input.parentElement.parentElement.querySelector("label")
-                            ?.innerText === "From"
-                    ) {
-                        fromInput = input;
-                    }
-                });
-                const inputs = rejectModal.querySelectorAll(
-                    '#reject-modal input[type="text"]'
-                );
-                inputs.forEach((input) => {
-                    if (input.previousElementSibling?.innerText === "Subject") {
-                        subjectInput = input;
-                    }
-                });
-                const rejectChecker = setInterval(() => {
-                    if (subjectInput.value !== "") {
-                        clearInterval(rejectChecker);
-                        setFromToNoReply(fromInput);
-                        rejectButton.click();
-                        setEnabled();
-                        setTimeout(
-                            () => rejectModal.classList.remove("hide-modal"),
-                            500
-                        );
-                    }
-                }, 500);
+                            // handle emailable candidate rejection
+                            if (!sendEmailInput.checked) {
+                                sendEmailInput.click();
+                            }
+                            let fromInput;
+                            let subjectInput;
+                            const dropdownContainers = rejectModal.querySelectorAll(
+                                "#reject-modal .sl-dropdown-container"
+                            );
+                            dropdownContainers.forEach((input) => {
+                                if (
+                                    input.parentElement.parentElement.querySelector("label")
+                                        ?.innerText === "From"
+                                ) {
+                                    fromInput = input;
+                                }
+                            });
+                            const inputs = rejectModal.querySelectorAll(
+                                '#reject-modal input[type="text"]'
+                            );
+                            inputs.forEach((input) => {
+                                if (input.previousElementSibling?.innerText === "Subject") {
+                                    subjectInput = input;
+                                }
+                            });
+                            
+                            const rejectChecker = setInterval(() => {
+                                if (subjectInput.value !== "") {
+                                    clearInterval(rejectChecker);
+                                    setFromToNoReply(fromInput);
+                                    rejectButton.click();
+                                    setEnabled();
+                                    setTimeout(() => rejectModal.classList.remove("hide-modal"), 500);
+                                }
+                            }, 500); // interval to wait for subject input to populate before rejection
+                        }
+                    }, 100); // interval to check for reason selector dropdown
+                }, 100); // interval to wait for reject modal to be hidden
             }
-        }, 100);
+        }, 100); // interval to wait for reject modal to be visible
     }
 
     // State utilities
