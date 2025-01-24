@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Open Candidate Profile in new Tab if Duplicate Badge is detected
 // @namespace    https://canonical.com/
-// @version      0.2.0
+// @version      0.3.0
 // @author       Thorsten Merten <thorsten.merten@canonical.com>
 // @description  This script will color the entire header and open a new tab automatically if the candiate duplicate tag is detected. Saves time and reminds you to get merging.
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
@@ -80,19 +80,33 @@
     // for page load (Do not use DOMSubtreeModified event as its obsolete and about to be deprecated)
     const observer = new MutationObserver((mutationList) => {
         mutationList.forEach((mutation) => {
+            // sometimes the new candidate link is added by a
+            // child list mutation and sometimes by an
+            // attribute mutation. The following checks in both.
+            let foundLink = false;
+
             if (mutation.type === "childList") {
-                let foundLink = false;
-                mutation.addedNodes.forEach((node) => {
+                for (let node of mutation.addedNodes) {
                     if (node.innerHTML?.includes('href="/people/')) {
                         foundLink = true;
+                        break;
                     }
-                });
-                if (foundLink) {
-                    setTimeout(function () {
-                        // need to wait a bit until the new profile has been rendered
-                        checkDuplicateAndOpenInTab();
-                    }, 250);
                 }
+            }
+
+            if (!foundLink &&
+                mutation.type === "attributes" &&
+                mutation.attributeName == "href" &&
+                mutation.target.href.includes('/people/')
+               ) {
+                foundLink = true;
+            }
+
+            if (foundLink) {
+                setTimeout(function () {
+                    // need to wait a bit until the new profile has been rendered
+                    checkDuplicateAndOpenInTab();
+                }, 250);
             }
         });
     });
