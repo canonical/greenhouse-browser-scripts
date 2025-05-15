@@ -13,6 +13,7 @@ Here is the list of the available Userscripts:
 -   [Greenhouse Duplicate Check Helper](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/duplicate-check.user.js): If a candidate duplicate tag is detected, the script colors the entire header, so that it is harder to overlook. Also, it opens the duplicate candidate in a new tab so that you can start checking quicker.
 -   [Talent Interview Field Reminder](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/talent-interview-field-reminder.user.js): Create a reminder to update application custom fields after moving candidates to the Talent Interview stage
 -   [To-do expander](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/todo-expander.user.js): Provides a "Reveal all" button to the bulk action set to expand the todo per candidate row
+-   [Greenhouse Google Meet Auto-select](https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/google-meet-auto-select.user.js): Automatically selects "Google Meet" option for video conferencing on Greenhouse manual scheduling page
 
 ## Getting started
 
@@ -47,6 +48,7 @@ Once the browser extension is installed, for each script the you wish to install
 -   Greenhouse Application Review Helper: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/application-review-helper.user.js
 -   Greenhouse Duplicate Check Helper: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/duplicate-check.user.js
 -   Talent Interview Field Reminder: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/talent-interview-field-reminder.user.js
+-   Greenhouse Google Meet Auto-Select: https://raw.githubusercontent.com/canonical/greenhouse-browser-scripts/main/google-meet-auto-select.user.js
 
 ## Receiving updates
 
@@ -105,3 +107,8 @@ The alert will remind HLs to update the 'HL - Proposed level' and 'HL - Years of
 
 Adds a button to the bulk actions section of that Greenhouse candidate list. This button reveals all todo sections on each candidate displayed on the list.
 ![Greenhouse todo reveal all button](/resources/todo-expander.png)
+
+## Greenhouse "Google Meet" auto-select
+Automatically selects "Google Meet" option for video conferencing on Greenhouse manual scheduling page.
+
+(**N.B.** Currently only works for v1 (old version) of the Greenhouse UI, not v2 yet.)
