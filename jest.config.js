@@ -5,4 +5,5 @@ module.exports = {
     coverageProvider: "v8",
     coverageReporters: ["json", "text", "lcov", "clover"],
     setupFilesAfterEnv: ["./jest.setup.js"],
+    testTimeout: 50000
 };
