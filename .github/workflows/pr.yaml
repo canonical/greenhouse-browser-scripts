@@ -8,7 +8,7 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v3
             - name: Setup NodeJS
-              run: sudo snap install node --channel=16/stable --classic
+              run: sudo snap install node --channel=22/stable --classic
             - name: Install project dependencies
               run: yarn
             - name: Run tests
