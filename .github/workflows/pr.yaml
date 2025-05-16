@@ -7,9 +7,15 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v3
-            - name: Setup NodeJS
-              run: sudo snap install node --channel=22/stable --classic
+            
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+                cache: 'yarn'
+            
             - name: Install project dependencies
-              run: yarn
+              run: yarn install --frozen-lockfile
+            
             - name: Run tests
               run: yarn test
