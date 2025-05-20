@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Greenhouse Google Meet Auto-select
 // @namespace    https://canonical.com/
-// @version      0.1.0
+// @version      1.1.0
 // @author       Nathan Clairmonte <nathan.clairmonte@canonical.com>
 // @description  Automatically selects "Google Meet" option for video conferencing on Greenhouse manual scheduling page.
 // @homepage     https://github.com/canonical/greenhouse-browser-scripts
