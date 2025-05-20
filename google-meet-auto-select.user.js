@@ -32,8 +32,8 @@
 
     console.log("[GH GMeet Auto-select] Script execution started.", true);
 
-    const MAX_RETRIES = 23;
-    const RETRY_DELAY = 500;
+    const MAX_RETRIES = 100;
+    const RETRY_DELAY = 50;
     let hasSuccessfullySelectedMeet = false;
     let workflowActionInProgress = false;
 
