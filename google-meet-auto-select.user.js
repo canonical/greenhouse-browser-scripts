@@ -12,6 +12,7 @@
 // @supportURL   https://github.com/canonical/greenhouse-browser-scripts/issues
 // @connect      https://canonical.greenhouse.io
 // @match        https://*.greenhouse.io/interviews/scheduler?*landing_page=manualScheduling*
+// @match        https://*.greenhouse.io/interviews/scheduler/v2?*landing_page=manualScheduling*
 // @grant        none
 // ==/UserScript==
 
@@ -110,12 +111,13 @@
         // get the "Add Video Conferencing" link
         let addVideoLink = Array.from(
             document.querySelectorAll(
-                'a[data-provides="add-video-conferencing-link"]'
+                'a[data-provides="add-video-conferencing-link"], a, button'
             )
         ).find(
-            (a) =>
-                isElementVisible(a) &&
-                a.textContent?.trim() === "Add Video Conferencing"
+            (el) =>
+                (isElementVisible(el) &&
+                    el.textContent?.trim() === "Add Video Conferencing") || // old UI
+                el.textContent?.trim() === "Add video conferencing" // new UI
         );
 
         if (!isElementVisible(addVideoLink)) {
@@ -148,18 +150,11 @@
                 return;
             }
 
-            const videoDropdown = document.getElementById(
-                "select-video-provider"
-            );
-            addVideoLink = Array.from(
-                document.querySelectorAll(
-                    'a[data-provides="add-video-conferencing-link"]'
-                )
-            ).find(
-                (a) =>
-                    isElementVisible(a) &&
-                    a.textContent?.trim() === "Add Video Conferencing"
-            );
+            const videoDropdown =
+                document.getElementById("select-video-provider") || // old UI
+                document.querySelector(
+                    "[role='combobox'][aria-haspopup='listbox']" // new UI
+                );
 
             if (isElementVisible(videoDropdown)) {
                 log(
@@ -167,14 +162,9 @@
                 );
                 clearInterval(workflowIntervalId);
                 selectGoogleMeet();
-            } else if (addVideoLink) {
-                log(
-                    "runWorkflow: 'Add Video Conferencing' link exists but click failed. Clicking again."
-                );
-                dispatchMouseEvent(addVideoLink, "click");
             } else {
                 log(
-                    "runWorkflow: 'Add Video Conferencing' link disappeared or video area not yet visible. Waiting for retry..."
+                    "runWorkflow: Video conferencing selection area not yet visible. Waiting for retry..."
                 );
             }
         }, RETRY_DELAY);
@@ -184,11 +174,6 @@
      * attempts to select "Google Meet" from the video conferencing dropdown.
      */
     async function selectGoogleMeet() {
-        // exit if we have already succeeded
-        if (hasSuccessfullySelectedMeet) {
-            workflowActionInProgress = false;
-            return;
-        }
         log("selectGoogleMeet: Attempting to select Google Meet...");
 
         let retries = 0;
@@ -205,95 +190,183 @@
             if (retries > MAX_RETRIES) {
                 clearInterval(selectIntervalId);
                 log(
-                    "selectGoogleMeet interval: Max retries reached for selecting Google Meet. Aborting."
+                    "selectGoogleMeet: Max retries reached for selecting Google Meet. Aborting."
                 );
                 workflowActionInProgress = false;
                 return;
             }
 
             // select the dropdown container. exit and wait for retry if it's not there yet
-            const dropdownContainer = document.getElementById(
+            const oldUIDropdown = document.getElementById(
                 "select-video-provider"
             );
-            if (!isElementVisible(dropdownContainer)) {
+            const newUIDropdown = document.querySelector(
+                "[role='combobox'][aria-haspopup='listbox']"
+            );
+            if (
+                !isElementVisible(oldUIDropdown) &&
+                !isElementVisible(newUIDropdown)
+            ) {
                 log(
                     "selectGoogleMeet interval: Video dropdown container not visible yet. Waiting for retry..."
                 );
                 return;
             }
 
-            // select relevant dropdown elements
-            const dropdownInput = dropdownContainer.querySelector(
-                "input#add_video_conferencing_input"
-            );
-            const dropdownControl = dropdownContainer.querySelector(
-                ".sl-dropdown__control"
-            );
-            const selectedValueDisplay = dropdownContainer.querySelector(
-                ".sl-dropdown__single-value"
-            );
+            const isNewUI = !!newUIDropdown && isElementVisible(newUIDropdown);
 
-            // if success, update hasSuccessfullySelectedMeet flag and exit
-            if (
-                selectedValueDisplay &&
-                selectedValueDisplay.textContent?.trim() === "Google Meet"
-            ) {
-                console.log(
-                    "[GH GMeet Auto-select] Google Meet option selected. Success!"
+            if (isNewUI) {
+                // ------- handle new UI -------
+
+                // select relevant dropdown elements
+                const videoConfLabel = Array.from(
+                    document.querySelectorAll("label")
+                ).find(
+                    (label) => label.textContent.trim() === "Video conferencing"
                 );
-                hasSuccessfullySelectedMeet = true;
-                clearInterval(selectIntervalId);
-                workflowActionInProgress = false;
-                return;
-            }
+                const videoConfInputId = videoConfLabel?.getAttribute("for");
+                const dropdownIdNumber = videoConfInputId?.match(
+                    /downshift-(\d+)-input/
+                )?.[1]; // extract the numeric part from input ID (e.g., "38" from "downshift-38-input")
+                const comboboxElement = document.querySelector(
+                    `div[role="combobox"][aria-controls="downshift-${dropdownIdNumber}-menu"]`
+                );
+                const dropdownInput = document.getElementById(videoConfInputId);
+                const textContent = dropdownInput?.value?.trim() || "";
 
-            // first check if dropdown menu is open already
-            // if not, focus and dispatch arrowdown to open it
-            if (dropdownInput && dropdownControl) {
-                const menu =
-                    dropdownContainer.querySelector(".sl-dropdown__menu");
-                const isMenuOpen =
-                    dropdownControl.classList.contains(
-                        "sl-dropdown__control--menu-is-open"
-                    ) || isElementVisible(menu);
-                if (!isMenuOpen) {
-                    log(
-                        "selectGoogleMeet: Dropdown menu not open. Focusing input and dispatching ArrowDown."
+                // if success, update hasSuccessfullySelectedMeet flag and exit
+                if (textContent === "Google Meet") {
+                    console.log(
+                        "[GH GMeet Auto-select] Google Meet option selected for new UI. Success!"
                     );
-                    dropdownInput.focus();
-                    // N.B. click event does not open dropdown, we must dispatch arrowdown instead
-                    dispatchKeyboardEvent(
-                        dropdownInput,
-                        "keydown",
-                        "ArrowDown"
-                    );
-                } else {
-                    log(
-                        "selectGoogleMeet: Dropdown menu is open. Attempting to find and select Google Meet option."
-                    );
-                    const googleMeetOption = Array.from(
-                        document.querySelectorAll(".sl-dropdown__option")
-                    ).find(
-                        (option) =>
-                            option.textContent?.trim() === "Google Meet" &&
-                            isElementVisible(option)
-                    );
+                    hasSuccessfullySelectedMeet = true;
+                    clearInterval(selectIntervalId);
+                    workflowActionInProgress = false;
+                    dropdownInput.blur();
+                    return;
+                }
 
-                    if (googleMeetOption) {
+                // first check if dropdown menu is open already
+                // if not, focus and dispatch arrowdown to open it
+                if (dropdownInput && comboboxElement) {
+                    const isMenuOpen =
+                        comboboxElement.getAttribute("aria-expanded") ===
+                        "true";
+
+                    if (!isMenuOpen) {
                         log(
-                            "selectGoogleMeet: Google Meet option found. Clicking it."
+                            "selectGoogleMeet (new UI): Dropdown menu not open. Focusing input and dispatching ArrowDown."
                         );
-                        dispatchMouseEvent(googleMeetOption, "click");
+                        dropdownInput.focus();
+                        dispatchMouseEvent(dropdownInput, "click");
                     } else {
                         log(
-                            "selectGoogleMeet: Google Meet option not found in visible menu. Waiting for retry..."
+                            "selectGoogleMeet (new UI): Dropdown menu is open. Attempting to find and select Google Meet option."
                         );
+
+                        const menuId = `downshift-${dropdownIdNumber}-menu`;
+                        const googleMeetOptions = Array.from(
+                            document.querySelectorAll(
+                                `#${menuId} [role="option"], #${menuId} li`
+                            )
+                        ).filter(
+                            (option) =>
+                                option.textContent?.trim() === "Google Meet" &&
+                                isElementVisible(option)
+                        );
+
+                        if (googleMeetOptions.length > 0) {
+                            log(
+                                "selectGoogleMeet (new UI): Google Meet option found. Clicking it."
+                            );
+                            dispatchMouseEvent(googleMeetOptions[0], "click");
+                        } else {
+                            log(
+                                "selectGoogleMeet (new UI): Google Meet option not found in visible menu. Waiting for retry..."
+                            );
+                        }
                     }
+                } else {
+                    log(
+                        "selectGoogleMeet (new UI): Dropdown input or control not found. Waiting for retry..."
+                    );
                 }
             } else {
-                log(
-                    "selectGoogleMeet: Dropdown input or control not found. Waiting for retry..."
+                // ------- handle old UI -------
+
+                // select relevant dropdown elements
+                const dropdownInput = oldUIDropdown.querySelector(
+                    "input#add_video_conferencing_input"
                 );
+                const dropdownControl = oldUIDropdown.querySelector(
+                    ".sl-dropdown__control"
+                );
+                const selectedValueDisplay = oldUIDropdown.querySelector(
+                    ".sl-dropdown__single-value"
+                );
+
+                // if success, update hasSuccessfullySelectedMeet flag and exit
+                if (
+                    selectedValueDisplay &&
+                    selectedValueDisplay.textContent?.trim() === "Google Meet"
+                ) {
+                    console.log(
+                        "[GH GMeet Auto-select] Google Meet option selected for old UI. Success!"
+                    );
+                    hasSuccessfullySelectedMeet = true;
+                    clearInterval(selectIntervalId);
+                    workflowActionInProgress = false;
+                    return;
+                }
+
+                // first check if dropdown menu is open already
+                // if not, focus and dispatch arrowdown to open it
+                if (dropdownInput && dropdownControl) {
+                    const menu =
+                        oldUIDropdown.querySelector(".sl-dropdown__menu");
+                    const isMenuOpen =
+                        dropdownControl.classList.contains(
+                            "sl-dropdown__control--menu-is-open"
+                        ) || isElementVisible(menu);
+                    if (!isMenuOpen) {
+                        log(
+                            "selectGoogleMeet (old UI): Dropdown menu not open. Focusing input and dispatching ArrowDown."
+                        );
+                        dropdownInput.focus();
+                        // N.B. click event does not open dropdown, we must dispatch arrowdown instead
+                        dispatchKeyboardEvent(
+                            dropdownInput,
+                            "keydown",
+                            "ArrowDown"
+                        );
+                    } else {
+                        log(
+                            "selectGoogleMeet (old UI): Dropdown menu is open. Attempting to find and select Google Meet option."
+                        );
+                        const googleMeetOption = Array.from(
+                            document.querySelectorAll(".sl-dropdown__option")
+                        ).find(
+                            (option) =>
+                                option.textContent?.trim() === "Google Meet" &&
+                                isElementVisible(option)
+                        );
+
+                        if (googleMeetOption) {
+                            log(
+                                "selectGoogleMeet (old UI): Google Meet option found. Clicking it."
+                            );
+                            dispatchMouseEvent(googleMeetOption, "click");
+                        } else {
+                            log(
+                                "selectGoogleMeet (old UI): Google Meet option not found in visible menu. Waiting for retry..."
+                            );
+                        }
+                    }
+                } else {
+                    log(
+                        "selectGoogleMeet (old UI): Dropdown input or control not found. Waiting for retry..."
+                    );
+                }
             }
         }, RETRY_DELAY);
     }
