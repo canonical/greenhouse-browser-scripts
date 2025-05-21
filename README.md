@@ -111,4 +111,4 @@ Adds a button to the bulk actions section of that Greenhouse candidate list. Thi
 ## Greenhouse "Google Meet" auto-select
 Automatically selects "Google Meet" option for video conferencing on Greenhouse manual scheduling page.
 
-(**N.B.** Currently only works for v1 (old version) of the Greenhouse UI, not v2 yet.)
+(Now working for both the old version and the new version of the Greenhouse UI)
